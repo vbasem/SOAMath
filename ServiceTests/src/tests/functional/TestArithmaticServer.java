@@ -1,4 +1,4 @@
-package tests.functional;
+package functional;
 
 import static org.junit.Assert.*;
 
