@@ -1,0 +1,14 @@
+* {
+  border: none;
+}
+
+textarea:focus, input:focus {
+        border: 2px solid #900;
+}
+
+label {
+        float: left;
+        text-align: right;
+        margin-right: 15px;
+        width: 100px;
+}
