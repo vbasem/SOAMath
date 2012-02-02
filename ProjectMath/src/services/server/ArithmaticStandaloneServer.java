@@ -9,6 +9,8 @@ import services.registry.RegistryServiceClient;
 import utils.ArgumentParser;
 import utils.networking.NetworkIpFinder;
 
+import org.soa.service.registry.ServiceType;
+
 public class ArithmaticStandaloneServer extends StandaloneServer
 {
     private ArgumentParser parser;
@@ -32,7 +34,10 @@ public class ArithmaticStandaloneServer extends StandaloneServer
     {
         abortIfNotEnoughArguments(args);
         parser = new ArgumentParser(args);
-        publisher = new RegistryServiceClient(parser.getServiceId(), getServingUrl());
+        publisher = new RegistryServiceClient(
+        		parser.getServiceId(),
+        		getServingUrl(),
+        		parser.getServiceTypeEnumeration().toString());
         publisher.publish();
     }
 

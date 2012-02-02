@@ -8,6 +8,7 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.*;
 
 import services.arithmatic.AdditionService;
+import services.arithmatic.ArithmaticServiceType;
 
 public class ArgumentParserTests
 {
@@ -88,7 +89,23 @@ public class ArgumentParserTests
     	ArgumentParser ap  = new ArgumentParser(args);
 
     	try {
-			ap.getServiceId();
+			assertEquals(expectedIdentifier, ap.getServiceId());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			fail("cant get here");
+		}
+    }
+
+    @Test public void test_getServiceTypeEnumeration_givenIdentifier_returnsEnum()
+    {
+    	ArithmaticServiceType expectedEnum = ArithmaticServiceType.ADDITION;
+
+    	String[] args = {"--servicemode=" + expectedEnum};
+
+    	ArgumentParser ap  = new ArgumentParser(args);
+
+    	try {
+			assertEquals(expectedEnum, ap.getServiceTypeEnumeration());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			fail("cant get here");

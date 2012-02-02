@@ -1,13 +1,13 @@
 package services.registry;
 
-import static org.junit.Assert.*;
 
 import java.io.Closeable;
 import java.io.IOException;
 import javax.xml.ws.WebServiceRef;
 
-import org.junit.Test;
 import org.soa.service.registry.RegistryAndLookUpService;
+import org.soa.service.registry.ServiceType;
+
 
 public class RegistryServiceClient implements Publishable
 {
@@ -17,12 +17,14 @@ public class RegistryServiceClient implements Publishable
 
 	private String serviceId;
 	private String serviceUrl;
+	private String serviceType;
 
-	public RegistryServiceClient(String serviceId, String serviceUrl)
+	public RegistryServiceClient(String serviceId, String serviceUrl, String serviceType)
 	{
 		service = new RegistryAndLookUpService();
 		this.serviceId = serviceId;
 		this.serviceUrl = serviceUrl;
+		this.serviceType = serviceType;
 
 	}
 
@@ -31,7 +33,7 @@ public class RegistryServiceClient implements Publishable
 	{
 
 		org.soa.service.registry.RegistryAndLookUp port = service.getRegistryAndLookUpPort();
-		port.registerServiceWsdlUri(serviceId, serviceUrl);
+		port.registerArithmaticService(serviceId, serviceUrl, serviceType);
 
 		try {
 			((Closeable) port).close();

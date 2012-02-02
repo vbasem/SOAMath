@@ -33,9 +33,16 @@ public class ArgumentParser
 
     public ArithmaticService getServiceMode() throws Exception
     {
-         String mode = getArgumentIfPresent(SERVICE_MODE_IDENTIFIER);
+         ArithmaticServiceType enumType = getServiceTypeEnumeration();
 
-        return instantiateServiceFromEnum(ArithmaticServiceType.valueOf(mode.toUpperCase()));
+        return instantiateServiceFromEnum(enumType);
+    }
+
+    public ArithmaticServiceType getServiceTypeEnumeration() throws Exception
+    {
+    	String mode = getArgumentIfPresent(SERVICE_MODE_IDENTIFIER);
+
+    	return ArithmaticServiceType.valueOf(mode.toUpperCase());
     }
 
 
