@@ -4,41 +4,37 @@
  */
 package org.soa.math.executer;
 
+import org.soa.math.executer.task.Task;
 import java.util.Observable;
+import org.soa.math.request.RequestType;
 import org.soa.math.resource.Resource;
 
 /**
  *
  * @author Basem
  */
-public abstract class Executer extends Observable implements Runnable
+public abstract class TaskExecutor extends Observable implements Runnable
 {
-    private Task task;
-    private Resource resource;
+    protected Task task;
+    protected Resource resource;
     
-    public Executer(Task task)
+        
+    public abstract void execute();
+    
+    public TaskExecutor(Task task)
     {
         this.task = task;
     }
     
     public Resource acquireResource(RequestType type)
     {
-        
+        return ResourceManager.getServiceResource(type);
     }
     
-    public void execute()
-    {   
-        
-        
-    }
-
-    @Override
-    public void run()
+    public void triggerTaskCompletedEvent()
     {
-        resource = acquireResource(task.getType());
-        task.setResult(resource.getResourceClient().executeTask(task));
-        
         this.setChanged();
         this.notifyObservers(task);
     }
+
 }

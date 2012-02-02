@@ -4,6 +4,7 @@
  */
 package org.soa.math.executer;
 
+import org.soa.math.executer.task.Task;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -11,33 +12,28 @@ import java.util.Observer;
  *
  * @author Basem
  */
-public class ExecutionControl extends Observable implements Observer 
+public class ExecutionControl extends Observable implements Observer
 {
-    
-    private static ExecutionControl control = null;
-    
-    public ExecutionControl getInstance()
-    {
-        if (control == null)
-        {
-            control = new ExecutionControl();
-        }
-        
-        return control;
-    }
-    
     public void startExecuterWithTask(Task task)
     {
-        Executer exec = new SoaExecuter(task);
+        TaskExecutor exec = new ThreadedTaskExecutor(task);
         exec.addObserver(this);
-        Thread t = new Thread();
+        Thread t = new Thread(exec);
         t.start();
     }
     
+    /**
+     * notify the task object that its result has been set and it can return
+     * the value from its feature get()
+     * @param o
+     * @param Task task 
+     */
     @Override
-    public void update(Observable o, Object arg) {
+    public void update(Observable o, Object arg)
+    {
+        arg.notify();
         setChanged();
-        notifyAll();
+        notifyObservers();
     }
     
 }

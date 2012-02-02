@@ -12,12 +12,32 @@ import java.util.logging.Logger;
  * @author Basem
  */
 public class Waker {
+
+    private Thread t;
+    private Sleeper s;
     
-    private Sleeper t;
+    public Waker(Sleeper s)
+    {
+        this.s = s;
+        signal();
+    }
     
-    public Waker(Sleeper t) {
+    public void signal()
+    {
+        System.out.println("sleeping for 4 before waking sleeper up");
+        try {
+            Thread.sleep(4000);
+            System.out.println("attempting to wake sleeper");
+            synchronized(s) {
+                s.notify();
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Waker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Waker(Thread t) {
         this.t = t;
-        awaken();
         System.out.println("sleeping for 2 before waking sleeper up");
         try {
             Thread.sleep(2000);
@@ -27,10 +47,10 @@ public class Waker {
             Logger.getLogger(Waker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private synchronized void awaken() {
-        
-        t.notify();
-        
+
+    private void awaken() {
+        synchronized (t) {
+            t.notify();
+        }
     }
 }

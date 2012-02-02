@@ -5,7 +5,16 @@
         <data xmlns="http://www.netbeans.org/ns/web-project/3">
             <name>SOADispatcher</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
-            <web-module-libraries/>
+            <web-module-libraries>
+                <library dirs="200">
+                    <file>${file.reference.SOADispatcher-resources}</file>
+                    <path-in-war>WEB-INF/classes</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.SOADispatcher-jax-ws}</file>
+                    <path-in-war>WEB-INF/classes</path-in-war>
+                </library>
+            </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>
                 <root id="src.jax-ws.dir"/>

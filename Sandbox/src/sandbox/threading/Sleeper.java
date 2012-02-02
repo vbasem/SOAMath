@@ -4,6 +4,7 @@
  */
 package sandbox.threading;
 
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,30 +12,16 @@ import java.util.logging.Logger;
  *
  * @author Basem
  */
-public class Sleeper implements Runnable {
-
-    public static void main(String[] args) {
-        Sleeper s = new Sleeper();
-        Thread t = new Thread(s);
-        t.start();
-
-        Waker w = new Waker(s);
-    }
+public class Sleeper implements Callable {
 
     @Override
-    public void run() {
-
-        System.out.println("main thread started, going to sleep");
-        snooze();
-        System.out.println("woken up, resuming");
-    }
-
-    public synchronized void snooze() {
-        try {
+    public Object call() throws Exception
+    {
+        synchronized(this)
+        {
             this.wait();
-                //Thread.currentThread().wait();
-            }  catch (InterruptedException ex) {
-            Logger.getLogger(Sleeper.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return "hi";
     }
 }

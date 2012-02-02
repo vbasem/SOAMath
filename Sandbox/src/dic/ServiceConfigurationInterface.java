@@ -2,15 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.soa.math.resource;
-
-import java.util.Observable;
+package dic;
 
 /**
  *
  * @author Basem
  */
-public class ArithmaticResource extends Observable
+public interface ServiceConfigurationInterface
 {
-    
+    public String getConfig();
 }
