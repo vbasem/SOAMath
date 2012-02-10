@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.soa.math.executer.ExecutorFactory;
 import org.soa.math.executer.task.Task;
-import org.soa.math.properties.DispatcherSettings;
+import org.soa.math.properties.Settings;
 import org.soa.math.global.Monitor;
 
 /**
@@ -91,7 +91,7 @@ public class QueueMonitor implements Monitor, Runnable
 
     protected boolean areFreeSlotsAvailable()
     {
-        if (slotsUsed < DispatcherSettings.getNumericProperty("max_number_of_tasks_being_executed"))
+        if (slotsUsed < Settings.getNumericProperty("max_number_of_tasks_being_executed"))
         {
             return true;
         }

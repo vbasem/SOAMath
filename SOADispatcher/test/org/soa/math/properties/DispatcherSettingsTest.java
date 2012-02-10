@@ -34,19 +34,19 @@ public class DispatcherSettingsTest {
     
     @After
     public void tearDown() {
-        DispatcherSettings.resetProperties();
+        Settings.resetProperties();
     }
 
     /**
-     * Test of getProperty method, of class DispatcherSettings.
+     * Test of getProperty method, of class Settings.
      */
     @Test
     public void testGetProperty() {
         System.out.println("getProperty");
         String key = TEST_PROPERTY_KEY;
         String expResult = TEST_PROPERTY_VALUE;
-        DispatcherSettings.changePropertiesFileName(PROPERTIES_FILE_NAME);
-        String result = DispatcherSettings.getProperty(key);
+        Settings.setPropertiesFileName(PROPERTIES_FILE_NAME);
+        String result = Settings.getProperty(key);
         assertEquals(expResult, result);
     }
 }

@@ -4,8 +4,6 @@
  */
 package org.soa.service.registry;
 
-import org.soa.service.types.ServiceType;
-
 /**
  *
  * @author Basem

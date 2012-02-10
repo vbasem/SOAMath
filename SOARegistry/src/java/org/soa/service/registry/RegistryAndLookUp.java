@@ -4,12 +4,9 @@
  */
 package org.soa.service.registry;
 
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.jws.WebMethod;
 import javax.jws.WebService;
-import org.soa.service.types.ServiceType;
 /**
  *
  * @author Basem
@@ -24,6 +21,11 @@ public class RegistryAndLookUp
         Register.registerService(identifier, service);
     }
     
+    public RegisteredService[] listAllRegisteredServices()
+    {
+        return Register.listAllRegisteredServices();
+    }
+    
     public void unregisterService(String identifier)
     {
         Register.unregisterService(identifier); 
@@ -34,8 +36,8 @@ public class RegistryAndLookUp
         return Register.getServiceById(identifier);
     }
     
-//    public RegisteredService[] getAllServicesOfType(ServiceType type)
-//    {
-//        
-//    }
+    public RegisteredService[] getAllServicesOfType(String type)
+    {
+        return Register.getAllServicesOfType(type);
+    }
 }

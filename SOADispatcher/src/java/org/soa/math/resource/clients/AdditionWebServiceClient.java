@@ -6,19 +6,25 @@ package org.soa.math.resource.clients;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
+import javax.xml.namespace.QName;
 import org.soa.math.executer.task.Task;
 
 /**
  *
  * @author Basem
  */
-public class AdditionClient implements ResourceClient
+public class AdditionWebServiceClient extends WebServiceClient implements ResourceClient
 {
-    // @WebServiceRef(wsdlLocation =
-    // "http://192.168.56.1:8080/VirtualSOA/RegistryAndLookUpService?wsdl")
 
     private services.arithmatic.AdditionServiceService service;
+
+    @Override
+    public QName getDefaultQname()
+    {
+        return new QName("http://arithmatic.services/", "AdditionServiceService");
+    }
 
     @Override
     public void execute(Task task)
@@ -30,9 +36,10 @@ public class AdditionClient implements ResourceClient
 
     protected int add(int x, int y)
     {
-        service = new services.arithmatic.AdditionServiceService();
+        service = new services.arithmatic.AdditionServiceService(getEndPointUrl(), getQname());
 
         services.arithmatic.AdditionService port = service.getAdditionServicePort();
+
         int additionResult = port.calculate(x, y);
 
         try

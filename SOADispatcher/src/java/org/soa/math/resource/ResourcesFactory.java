@@ -6,6 +6,7 @@ package org.soa.math.resource;
 
 import org.soa.math.global.AbstractFactory;
 import org.soa.math.resource.clients.ClientFactory;
+import org.soa.math.resource.type.ResourceType;
 
 /**
  *
@@ -29,21 +30,22 @@ public class ResourcesFactory extends AbstractFactory
     {
         if (resourceMonitorStaticInstance == null)
         {
-            resourceMonitorStaticInstance = new ArithmaticServiceMonitor();
+            resourceMonitorStaticInstance = new ArithmaticWebServiceResourceMonitor();
         }
         
         return resourceMonitorStaticInstance;
     }
     
     
-    public static Resource getAdditionResource()
+    public static Resource getArithmaticWebServiceResource(ResourceType type)
     {
         if (isTestMode())
         {
             return null;
         }
         
-        Resource resource = new AdditionResource(ClientFactory.getAdditionClient());
+        Resource resource = new ArithmaticResource(ClientFactory.getAdditionWebServiceClient(), type);
+        
         return resource;
     }
 }

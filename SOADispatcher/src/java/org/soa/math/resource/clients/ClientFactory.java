@@ -12,8 +12,32 @@ import org.soa.math.global.AbstractFactory;
  */
 public class ClientFactory extends AbstractFactory
 {
-    public static ResourceClient getAdditionClient()
+    private static RegistryServiceClient registryService = null;
+    
+    public static WebServiceClient getAdditionWebServiceClient()
     {
-        return (ResourceClient) decideWhichObjectBasedOnEnv(new AdditionClient(), null);
+        if (isTestMode())
+        {
+            return null;
+        }
+
+        WebServiceClient client = new AdditionWebServiceClient();
+
+        return client;
+    }
+
+    public static RegistryServiceClient getRegistryServiceClient()
+    {
+        if (isTestMode())
+        {
+            return null;
+        }
+        
+        if (registryService == null)
+        {
+            registryService = new RegistryServiceClient();
+        }
+
+        return registryService;
     }
 }

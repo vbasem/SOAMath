@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import javax.el.MethodNotFoundException;
 import org.soa.math.executer.task.Task;
-import org.soa.math.properties.DispatcherSettings;
+import org.soa.math.properties.Settings;
 import org.soa.math.request.RequestType;
 
 /**

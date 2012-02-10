@@ -7,6 +7,7 @@ package org.soa.math.resource;
 import java.util.Observable;
 import org.soa.math.executer.task.Task;
 import org.soa.math.resource.clients.ResourceClient;
+import org.soa.math.resource.type.ResourceType;
 
 /**
  *
@@ -14,15 +15,42 @@ import org.soa.math.resource.clients.ResourceClient;
  */
 public abstract class Resource extends Observable
 {
+
     private boolean busyStatus = false;
     private String resourceDescriptor;
     private ResourceClient client;
+    private ResourceType type;
 
-    public Resource(ResourceClient client)
+    public ResourceClient getClient()
+    {
+        return client;
+    }
+
+    public Resource(ResourceClient client, ResourceType type)
+    {
+        this.client = client;
+        this.type = type;
+    }
+
+    public Resource()
+    {
+    }
+
+    public void setClient(ResourceClient client)
     {
         this.client = client;
     }
-    
+
+    public ResourceType getType()
+    {
+        return type;
+    }
+
+    public void setType(ResourceType type)
+    {
+        this.type = type;
+    }
+
     public boolean isBusy()
     {
         return busyStatus;
@@ -32,28 +60,27 @@ public abstract class Resource extends Observable
     {
         this.busyStatus = busyStatus;
     }
-    
-    public void setResourceDescriptor(String resourceDescriptor)
+
+    public void setResourceDescriptors(String resourceId)
     {
-        this.resourceDescriptor = resourceDescriptor;
+        this.resourceDescriptor = resourceId;
     }
-    
+
     public String getResourceDescriptor()
     {
         return this.resourceDescriptor;
     }
-    
+
     public void assignTaskToResource(Task task)
     {
         this.setBusyStatus(true);
         this.client.execute(task);
         signalAvailableResource();
     }
-    
+
     protected void signalAvailableResource()
     {
         this.setBusyStatus(false);
         this.notifyObservers();
     }
-
 }

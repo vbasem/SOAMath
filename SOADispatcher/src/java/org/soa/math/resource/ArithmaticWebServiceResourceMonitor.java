@@ -4,28 +4,34 @@
  */
 package org.soa.math.resource;
 
+import com.google.common.collect.HashBiMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
+import org.soa.math.resource.clients.ClientFactory;
 
 /**
  *
  * @author Basem
  */
-public class ArithmaticServiceMonitor implements ResourceMonitor
+public class ArithmaticWebServiceResourceMonitor implements ResourceMonitor, Runnable
 {
     protected Map resources = new HashMap();
+    protected Map registeredResourcesAvailable = new HashBiMap();
     
     @Override
     public void freeResource(Resource resource)
     {
+        String resourceId = resource.getResourceDescriptor();
+        
+        
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Resource acquireResource()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        ClientFactory.getRegistryServiceClient().getAllRegisteredServices();
     }
 
     @Override
@@ -42,6 +48,12 @@ public class ArithmaticServiceMonitor implements ResourceMonitor
 
     @Override
     public void update(Observable o, Object arg)
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void run()
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }
