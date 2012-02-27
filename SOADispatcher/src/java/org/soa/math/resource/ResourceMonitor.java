@@ -14,5 +14,5 @@ import org.soa.math.resource.Resource;
 public interface ResourceMonitor extends Monitor
 {
     public void freeResource(Resource resource);
-    public Resource acquireResource();   
+    public Resource acquireResource(String resourceType);   
 }

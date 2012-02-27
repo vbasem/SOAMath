@@ -37,13 +37,13 @@ public class ResourcesFactory extends AbstractFactory
     }
     
     
-    public static Resource getArithmaticWebServiceResource(ResourceType type)
+    public static Resource getArithmaticWebServiceResource(String resourceTypeName)
     {
         if (isTestMode())
         {
             return null;
         }
-        
+        ResourceType type = new ResourceType(resourceTypeName);
         Resource resource = new ArithmaticResource(ClientFactory.getAdditionWebServiceClient(), type);
         
         return resource;

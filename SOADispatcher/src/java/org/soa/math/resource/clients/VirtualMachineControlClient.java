@@ -2,14 +2,8 @@ package org.soa.math.resource.clients;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceRef;
 import org.soa.math.properties.SettingsRepository;
-import org.soa.service.registry.RegisteredService;
-
-import org.soa.service.registry.RegistryAndLookUpService;
 
 public class VirtualMachineControlClient extends WebServiceClient
 {
@@ -23,7 +17,7 @@ public class VirtualMachineControlClient extends WebServiceClient
         service = new org.soa.virtualmachine.webservice.VirtualMachineControlsService(getEndPointUrl(), getQname());
     }
 
-    public void startArithmaticService(String operationMode)
+    public void startService(String operationMode)
     {
         openPort();
         port.startArithmaticServer(operationMode);
@@ -53,7 +47,6 @@ public class VirtualMachineControlClient extends WebServiceClient
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
     }
 
     @Override

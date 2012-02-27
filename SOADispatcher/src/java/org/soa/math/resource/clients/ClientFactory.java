@@ -12,8 +12,10 @@ import org.soa.math.global.AbstractFactory;
  */
 public class ClientFactory extends AbstractFactory
 {
+
     private static RegistryServiceClient registryService = null;
-    
+    private static VirtualMachineControlClient vmClient = null;
+
     public static WebServiceClient getAdditionWebServiceClient()
     {
         if (isTestMode())
@@ -32,12 +34,27 @@ public class ClientFactory extends AbstractFactory
         {
             return null;
         }
-        
+
         if (registryService == null)
         {
             registryService = new RegistryServiceClient();
         }
 
         return registryService;
+    }
+
+    public static VirtualMachineControlClient getVmControlClient()
+    {
+        if (isTestMode())
+        {
+            return null;
+        }
+
+        if (vmClient == null)
+        {
+            vmClient = new VirtualMachineControlClient();
+        }
+
+        return vmClient;
     }
 }
