@@ -4,8 +4,12 @@
  */
 package org.soa.math.dispatch;
 
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.soa.math.executer.task.Task;
 import org.soa.math.queue.QueueAccess;
 
 /**
@@ -45,7 +49,17 @@ public class MathDispatchTest {
         Task task = QueueAccess.getRequestQueue().getWaitingTask();
         int expResult = 0;
         task.setResult(expResult);
-        int result = instance.add(x, y);
+        int result = -1;
+        try
+        {
+            result = instance.add(x, y);
+        } catch (InterruptedException ex)
+        {
+            Logger.getLogger(MathDispatchTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex)
+        {
+            Logger.getLogger(MathDispatchTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -75,7 +89,7 @@ public class MathDispatchTest {
         System.out.println("dispatchTak");
         Task t = null;
         MathDispatch instance = new MathDispatch();
-        instance.dispatchTask(t);
+        instance.getFutureResultFromTask(t);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

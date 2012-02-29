@@ -5,7 +5,6 @@
 package org.soa.math.resource;
 
 import org.soa.math.global.Monitor;
-import org.soa.math.resource.Resource;
 
 /**
  *

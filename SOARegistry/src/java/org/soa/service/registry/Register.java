@@ -37,9 +37,10 @@ public class Register
     
     public static RegisteredService[] listAllRegisteredServices()
     {
+        Logger.getLogger("registery").log(Level.INFO, "getting all services {0}", service_register.size());
         RegisteredService[] services = {};
-        services = service_register.keySet().toArray(services);
-
+        services = service_register.values().toArray(services);
+        
         return services;
     }
 

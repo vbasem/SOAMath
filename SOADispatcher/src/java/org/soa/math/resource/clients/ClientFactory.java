@@ -16,14 +16,14 @@ public class ClientFactory extends AbstractFactory
     private static RegistryServiceClient registryService = null;
     private static VirtualMachineControlClient vmClient = null;
 
-    public static WebServiceClient getAdditionWebServiceClient()
+    public static ResourceClient getAdditionWebServiceClient()
     {
         if (isTestMode())
         {
             return null;
         }
 
-        WebServiceClient client = new AdditionWebServiceClient();
+        ResourceClient client = new AdditionWebServiceClient();
 
         return client;
     }

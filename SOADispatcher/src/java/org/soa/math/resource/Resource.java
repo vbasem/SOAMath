@@ -28,6 +28,7 @@ public abstract class Resource extends Observable
 
     public Resource(ResourceClient client, ResourceType type)
     {
+        super();
         this.client = client;
         this.type = type;
     }

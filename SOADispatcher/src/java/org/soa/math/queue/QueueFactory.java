@@ -12,27 +12,42 @@ import org.soa.math.global.AbstractFactory;
  */
 public class QueueFactory extends AbstractFactory
 {
+
     protected static QueueMonitor staticQueueMonitorInstance = null;
-    
-    public static QueueMonitor getStaticQueueMonitor()
+    private static TaskQueue requestQueue = null;
+
+    public static TaskQueue getStaticRequestQueue()
     {
         if (isTestMode())
         {
             return null;
         }
         
+        if (requestQueue == null)
+        {
+            requestQueue = new RequestQueue();
+        }
+
+        return requestQueue;
+    }
+
+    public static QueueMonitor getStaticQueueMonitor()
+    {
+        if (isTestMode())
+        {
+            return null;
+        }
+
         return instantiateQueueMonitorSingleton();
     }
-    
+
     protected static QueueMonitor instantiateQueueMonitorSingleton()
     {
         if (staticQueueMonitorInstance == null)
         {
             staticQueueMonitorInstance = new QueueMonitor();
         }
-        
+
         return staticQueueMonitorInstance;
     }
-    
-    
 }

@@ -4,10 +4,11 @@
  */
 package org.soa.math.executer;
 
-import org.soa.math.executer.task.Task;
 import java.util.Observable;
+import org.soa.math.executer.task.Task;
 import org.soa.math.request.RequestType;
 import org.soa.math.resource.Resource;
+import org.soa.math.resource.ResourcesFactory;
 
 /**
  *
@@ -28,7 +29,7 @@ public abstract class TaskExecutor extends Observable implements Runnable
     
     public Resource acquireResource(RequestType type)
     {
-        return ResourceManager.getServiceResource(type);
+        return ResourcesFactory.getStaticArithmaticResourceMonitor().acquireResource(type.toString());
     }
     
     public void triggerTaskCompletedEvent()
@@ -36,5 +37,4 @@ public abstract class TaskExecutor extends Observable implements Runnable
         this.setChanged();
         this.notifyObservers(task);
     }
-
 }

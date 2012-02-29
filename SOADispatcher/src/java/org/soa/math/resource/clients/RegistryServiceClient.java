@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceRef;
 import org.soa.math.properties.SettingsRepository;
 import org.soa.service.registry.RegisteredService;
 
-import org.soa.service.registry.RegistryAndLookUpService;
 
 public class RegistryServiceClient extends WebServiceClient
 {
@@ -76,4 +74,5 @@ public class RegistryServiceClient extends WebServiceClient
     {
         return new QName("http://registry.service.soa.org/", "RegistryAndLookUpService");
     }
+
 }

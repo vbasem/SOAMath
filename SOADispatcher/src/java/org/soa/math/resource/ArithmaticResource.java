@@ -4,7 +4,7 @@
  */
 package org.soa.math.resource;
 
-import org.soa.math.resource.clients.WebServiceClient;
+import org.soa.math.resource.clients.ResourceClient;
 import org.soa.math.resource.type.ResourceType;
 
 /**
@@ -13,7 +13,7 @@ import org.soa.math.resource.type.ResourceType;
  */
 public class ArithmaticResource extends WebServiceResource
 {
-    public ArithmaticResource(WebServiceClient client, ResourceType type)
+    public ArithmaticResource(ResourceClient client, ResourceType type)
     {
         super(client, type);
     }

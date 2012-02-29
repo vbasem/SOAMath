@@ -26,7 +26,7 @@ public class Settings
         PropertiesLoader loader = new PropertiesLoader();
         try
         {
-            properties = loader.loadFromFilePath(new File(".").getCanonicalPath()
+            properties = loader.loadFromFilePath(new File("C:\\math\\SOAMath\\SOADispatcher").getCanonicalPath()
                     + File.separator
                     + properties_folder_name
                     + File.separator

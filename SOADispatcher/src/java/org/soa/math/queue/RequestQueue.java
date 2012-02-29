@@ -45,17 +45,17 @@ public class RequestQueue extends HashMap implements TaskQueue, Iterable
 
     }
 
-    private Future createFutureForTask(Task t)
+    private Future createFutureForTask(Task task)
     {
-        Future futureResult = taskFutureExecuter.submit(t);
+        Future futureResult = taskFutureExecuter.submit(task);
 
         return futureResult;
     }
 
-    private void addTaskToQueue(Task t)
+    private void addTaskToQueue(Task task)
     {
-        BlockingQueue queue = (BlockingQueue) get(t.getRequestType());
-        queue.add(t);
+        BlockingQueue queue = (BlockingQueue) get(task.getRequestType());
+        queue.add(task);
     }
 
     @Override

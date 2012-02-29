@@ -4,29 +4,37 @@
  */
 package org.soa.math.dispatch;
 
+import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import org.soa.math.executer.task.AdditionTask;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
 import org.soa.math.executer.task.Task;
-import org.soa.math.request.RequestType;
+import org.soa.math.queue.QueueFactory;
+import org.soa.math.resource.ResourcesFactory;
 
 /**
  *
  * @author Basem
  */
+@WebService()
 public class MathDispatch implements Observer
 {
- 
-    private Thread dispatchThread = Thread.currentThread();
-    
+    public MathDispatch()
+    {
+        QueueFactory.getStaticQueueMonitor().startMonitor();
+        ResourcesFactory.getStaticArithmaticResourceMonitor().startMonitor();
+    }
+    @WebMethod(operationName="add")
     public int add(int x, int y) throws InterruptedException, ExecutionException
     {
-        Task t = new AdditionTask<Integer>((RequestType.ADDITION, x, y);
-        String result = (String) dispatchTask(t).get();
+        Task t = TaskFactory.createAdditionTask(x, y);
+        String result = (String) getFutureResultFromTask(t).get();
         return Integer.getInteger(result);
     }
     
+    @WebMethod(operationName="multiply")
     public int multiply(int x, int y)
     {
         //Task t = createTask(RequestType.MULTIPLICATION, x, y);
@@ -34,10 +42,20 @@ public class MathDispatch implements Observer
         return 0;
     }
     
-    public Future dispatchTask(Task t)
+    private Future getFutureResultFromTask(Task t)
     {
-        Future futureResult = QueueAccess.getRequestQueue().getAdditionQueue().queueForFutureResult(t, dispatchThread);
+        Future futureResult = 
+                QueueFactory.
+                getStaticRequestQueue().
+                putToQueueAndGetFeatureObject(t);
+        
         return futureResult;
         
+    }
+
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

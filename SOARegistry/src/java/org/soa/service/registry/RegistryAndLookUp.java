@@ -14,11 +14,13 @@ import javax.jws.WebService;
 @WebService(name = "RegistryAndLookUp")
 public class RegistryAndLookUp
 {
-    public void registerArithmaticService(String identifier, String wsdlUri, String serviceType)
+    public String registerArithmaticService(String identifier, String wsdlUri, String serviceType)
     {
         Logger.getLogger("registery").log(Level.INFO, "service type is {0}", new Object[]{serviceType});
         RegisteredService service = new RegisteredServiceImpl(identifier, wsdlUri, serviceType);
         Register.registerService(identifier, service);
+        
+        return "ok";
     }
     
     public RegisteredService[] listAllRegisteredServices()
@@ -26,9 +28,11 @@ public class RegistryAndLookUp
         return Register.listAllRegisteredServices();
     }
     
-    public void unregisterService(String identifier)
+    public String unregisterService(String identifier)
     {
         Register.unregisterService(identifier); 
+        
+        return "ok";
     }
     
     public RegisteredService getServiceById(String identifier)

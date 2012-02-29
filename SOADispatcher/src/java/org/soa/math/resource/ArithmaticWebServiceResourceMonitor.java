@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.soa.math.properties.SettingsRepository;
 import org.soa.math.resource.clients.ClientFactory;
 import org.soa.service.registry.RegisteredService;
 
@@ -23,7 +24,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     protected Map<String, ResourceCollection> usedResources = new ConcurrentHashMap();
     protected Map<String, PendingResourceRequests> pendingResourceRequests = new ConcurrentHashMap();
     protected Map registeredResourcesAvailable = new ConcurrentHashMap();
-    protected Thread monitorThread;
+    protected Thread monitorThread = new Thread(this);;
     private boolean stopMonitoring = false;
 
     @Override
@@ -62,9 +63,11 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     @Override
     public void startMonitor()
     {
-        getAvailableResourcesFromRegistry();
-        monitorThread = new Thread(this);
-        monitorThread.start();
+        if (!monitorThread.isAlive())
+        {
+            Logger.getLogger(ArithmaticWebServiceResourceMonitor.class.getName()).log(Level.WARNING, "starting resource monitor");
+            monitorThread.start();
+        }
     }
 
     @Override
@@ -100,6 +103,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     {
         while (!stopMonitoring)
         {
+            getAvailableResourcesFromRegistry();
             balanceResourcesToMeetRequests();
            // balanceResourcesToMeetRequests();
 
@@ -107,7 +111,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
             try
             {
-                Thread.sleep(10);
+                Thread.sleep(1000);
             } catch (InterruptedException ex)
             {
                 Logger.getLogger(ArithmaticWebServiceResourceMonitor.class.getName()).log(Level.SEVERE, null, ex);
@@ -150,7 +154,11 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         {
             return res;
         }
-
+        
+        // try and start a new server for the service if possible
+        // the go to sleep until it comes online
+        startNewResourceServerIfPossible(resourceType);
+        
         pendingResourceRequests.get(resourceType).
                 addRequestThreadToPendingAndIncrement(Thread.currentThread());
 
@@ -227,10 +235,17 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
         for (RegisteredService service : registeredServices)
         {
+            // if we have it, skip it
+            if (registeredResourcesAvailable.containsKey(service.getId()))
+            {
+                continue;
+            }
+            
             Resource res = ResourcesFactory.getArithmaticWebServiceResource(service.getType());
             registeredResourcesAvailable.put(res.getResourceDescriptor(), res);
             res.addObserver(this);
-            putFreeResourceInCollection(res);
+            // check if anyone needs resource before adding it to free collection
+            checkIfAnyRequestIsPendingForThisResourceType(res);
         }
     }
 
@@ -321,5 +336,22 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         }
         
         return false;
+    }
+
+    private void startNewResourceServerIfPossible(String type)
+    {
+        int availableServers = 
+                SettingsRepository.
+                getConcurrencySettings().
+                getNumericProperty("number_of_available_machines");
+        
+        if (registeredResourcesAvailable.size() < availableServers)
+        {
+            ClientFactory.getVmControlClient().startService(type);
+        }
+        
+        // how do i wait till server is up?
+        // smply go into waiting, we notify the same way we do on finished resources
+        
     }
 }

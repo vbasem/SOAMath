@@ -18,7 +18,7 @@ public abstract class WebServiceClient
 {
 
     protected URL endPoint = null;
-    protected QName qname;
+    protected QName qname = null;
 
     public abstract QName getDefaultQname();
 

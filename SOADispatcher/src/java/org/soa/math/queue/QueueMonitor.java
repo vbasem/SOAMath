@@ -10,8 +10,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.soa.math.executer.ExecutorFactory;
 import org.soa.math.executer.task.Task;
-import org.soa.math.properties.Settings;
 import org.soa.math.global.Monitor;
+import org.soa.math.properties.Settings;
+import org.soa.math.properties.SettingsRepository;
 
 /**
  *
@@ -48,7 +49,11 @@ public class QueueMonitor implements Monitor, Runnable
     @Override
     public void startMonitor()
     {
-        monitoringThread.run();
+        if (!monitoringThread.isAlive())
+        {
+            Logger.getLogger(QueueMonitor.class.getName()).log(Level.WARNING, "starting queue monitor");
+            monitoringThread.start();
+        }
     }
     
     @Override
@@ -83,7 +88,7 @@ public class QueueMonitor implements Monitor, Runnable
     {
         if (itr == null || !itr.hasNext())
         {
-            itr =  QueueAccess.getRequestQueue().iterator();
+            itr =  QueueFactory.getStaticRequestQueue().iterator();
         }
         
         return itr;
@@ -91,12 +96,21 @@ public class QueueMonitor implements Monitor, Runnable
 
     protected boolean areFreeSlotsAvailable()
     {
-        if (slotsUsed < Settings.getNumericProperty("max_number_of_tasks_being_executed"))
+        boolean answer;
+        
+        if (slotsUsed <
+                SettingsRepository.
+                getConcurrencySettings().
+                getNumericProperty("max_number_of_tasks_being_executed"))
         {
-            return true;
+            answer = true;
+        }
+        else
+        {
+            answer = false;
         }
         
-        return false;
+        return answer;
     }
     
     protected void freeSlot()
