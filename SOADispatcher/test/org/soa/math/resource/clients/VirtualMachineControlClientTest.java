@@ -4,8 +4,6 @@
  */
 package org.soa.math.resource.clients;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -13,13 +11,13 @@ import static org.junit.Assert.*;
  *
  * @author Basem
  */
-public class RegistryServiceClientTest
+public class VirtualMachineControlClientTest
 {
     
-    public RegistryServiceClientTest()
+    public VirtualMachineControlClientTest()
     {
     }
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception
     {
@@ -41,11 +39,10 @@ public class RegistryServiceClientTest
     }
 
     @Test
-    public void getAllRegisteredServices_shouldNotThrowException()
+    public void stopService_shouldNotThrowException()
     {
-        RegistryServiceClient client = new RegistryServiceClient();
+        VirtualMachineControlClient client = new VirtualMachineControlClient();
         
-        client.getAllRegisteredServices();
+        client.stopService("123");
     }
-
 }

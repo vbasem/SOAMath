@@ -26,7 +26,7 @@ public class RequestQueue extends HashMap implements TaskQueue, Iterable
         instantiateQueueForTypeIfNotExists(t.getRequestType());
         Future futureResult = createFutureForTask(t);
         addTaskToQueue(t);
-
+        notifyQueueMonitor();
         return futureResult;
     }
 
@@ -38,11 +38,10 @@ public class RequestQueue extends HashMap implements TaskQueue, Iterable
     
     private void instantiateQueueForTypeIfNotExists(RequestType requestType)
     {
-        if (containsKey(requestType))
+        if (!containsKey(requestType))
         {
             put(requestType, new LinkedBlockingQueue());
         }
-
     }
 
     private Future createFutureForTask(Task task)
@@ -62,6 +61,11 @@ public class RequestQueue extends HashMap implements TaskQueue, Iterable
     public Iterator iterator()
     {
         return new Itr(this);
+    }
+
+    private void notifyQueueMonitor()
+    {
+        QueueFactory.getStaticQueueMonitor().startMonitor();
     }
     
     private class Itr implements Iterator

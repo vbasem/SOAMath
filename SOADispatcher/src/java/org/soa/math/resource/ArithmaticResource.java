@@ -13,8 +13,8 @@ import org.soa.math.resource.type.ResourceType;
  */
 public class ArithmaticResource extends WebServiceResource
 {
-    public ArithmaticResource(ResourceClient client, ResourceType type)
+    public ArithmaticResource(ResourceClient client, ResourceType type, String resourceDescriptor)
     {
-        super(client, type);
+        super(client, type, resourceDescriptor);
     }
 }

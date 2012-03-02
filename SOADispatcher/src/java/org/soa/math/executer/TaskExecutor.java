@@ -27,9 +27,9 @@ public abstract class TaskExecutor extends Observable implements Runnable
         this.task = task;
     }
     
-    public Resource acquireResource(RequestType type)
+    public Resource acquireResource()
     {
-        return ResourcesFactory.getStaticArithmaticResourceMonitor().acquireResource(type.toString());
+        return ResourcesFactory.getStaticArithmaticResourceMonitor().acquireResource(task.requestType.toString());
     }
     
     public void triggerTaskCompletedEvent()

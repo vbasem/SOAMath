@@ -26,11 +26,12 @@ public abstract class Resource extends Observable
         return client;
     }
 
-    public Resource(ResourceClient client, ResourceType type)
+    public Resource(ResourceClient client, ResourceType type, String resourceDescriptor)
     {
         super();
         this.client = client;
         this.type = type;
+        this.resourceDescriptor = resourceDescriptor;
     }
 
     public Resource()

@@ -7,8 +7,9 @@ package org.soa.math.dispatch;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.*;
-import static org.junit.Assert.*;
 import org.soa.math.executer.task.Task;
 import org.soa.math.queue.QueueAccess;
 

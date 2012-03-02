@@ -4,6 +4,7 @@
  */
 package org.soa.math.dispatch;
 
+import org.soa.math.executer.task.TaskFactory;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
@@ -56,6 +57,6 @@ public class MathDispatch implements Observer
     @Override
     public void update(Observable o, Object arg)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not sure if i need update on dispatch yet.");
     }
 }

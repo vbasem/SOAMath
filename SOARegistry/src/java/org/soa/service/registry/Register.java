@@ -16,30 +16,30 @@ import java.util.logging.Logger;
  */
 public class Register
 {
-    private static HashMap<String, RegisteredService> service_register = new HashMap<String, RegisteredService>();
+    private static HashMap<String, RegisteredService> serviceRegister = new HashMap<String, RegisteredService>();
     
     public static void registerService(String identifier, RegisteredService service )
     {
-        service_register.put(identifier, service);
+        serviceRegister.put(identifier, service);
         Logger.getLogger("registery").log(Level.INFO, "registring {0} at {1} requested at {2}", new Object[]{identifier, service.getUrl(), System.currentTimeMillis()});
     }
     
     public static RegisteredService getServiceById(String identifier)
     {
-        return service_register.get(identifier);
+        return serviceRegister.get(identifier);
     }
     
     public static void unregisterService(String identifier)
     {
-        service_register.remove(identifier);
+        serviceRegister.remove(identifier);
         Logger.getLogger("registery").log(Level.INFO, "removing {0}", identifier);
     }
     
     public static RegisteredService[] listAllRegisteredServices()
     {
-        Logger.getLogger("registery").log(Level.INFO, "getting all services {0}", service_register.size());
+        Logger.getLogger("registery").log(Level.INFO, "getting all services {0}", serviceRegister.size());
         RegisteredService[] services = {};
-        services = service_register.values().toArray(services);
+        services = serviceRegister.values().toArray(services);
         
         return services;
     }
@@ -49,7 +49,7 @@ public class Register
         RegisteredService[] resultArray = {};
         List<RegisteredService> servicesOfSameType = new ArrayList<RegisteredService>();
         
-        for (RegisteredService service: service_register.values())
+        for (RegisteredService service: serviceRegister.values())
         {
             Logger.getLogger("registry").log(Level.WARNING, type, service);
             Logger.getLogger("registry").log(Level.WARNING, service.getType(), service);

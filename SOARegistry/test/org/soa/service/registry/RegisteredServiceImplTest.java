@@ -24,7 +24,7 @@ public class RegisteredServiceImplTest {
     //public static final ServiceType TEST_SERVICE_TYPE = mock(ServiceType.class);
     public static final String TEST_SERVICE_TYPE = "ADDITION";
     
-    private RegisteredServiceImpl service;
+    private RegisteredService service;
           
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -37,7 +37,7 @@ public class RegisteredServiceImplTest {
     @Before
     public void setUp()
     {
-        service = new RegisteredServiceImpl(TEST_ID, TEST_URL, TEST_SERVICE_TYPE);
+        service = new RegisteredService(TEST_ID, TEST_URL, TEST_SERVICE_TYPE);
     }
     
     @After

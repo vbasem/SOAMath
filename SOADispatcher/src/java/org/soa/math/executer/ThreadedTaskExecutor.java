@@ -27,10 +27,8 @@ public class ThreadedTaskExecutor extends TaskExecutor implements Runnable
     @Override
     public void run()
     {
-        resource = acquireResource(task.getRequestType());
+        resource = acquireResource();
         resource.getClient().execute(task);
-        
-        
     }
     
 }

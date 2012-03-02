@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import org.soa.math.executer.ExecutorFactory;
 import org.soa.math.executer.task.Task;
 import org.soa.math.global.Monitor;
-import org.soa.math.properties.Settings;
 import org.soa.math.properties.SettingsRepository;
 
 /**
@@ -33,6 +32,7 @@ public class QueueMonitor implements Monitor, Runnable
         while (!stopMonitorThread)
         {
             fetchNewTaskRoundRobin();
+            
             synchronized(monitoringThread)
             {
                 try
@@ -53,6 +53,13 @@ public class QueueMonitor implements Monitor, Runnable
         {
             Logger.getLogger(QueueMonitor.class.getName()).log(Level.WARNING, "starting queue monitor");
             monitoringThread.start();
+        }
+        else
+        {
+            synchronized(monitoringThread)
+            {
+                monitoringThread.notify();
+            }
         }
     }
     
@@ -75,6 +82,7 @@ public class QueueMonitor implements Monitor, Runnable
     protected void fetchNewTaskRoundRobin()
     {
         Iterator iterator = getNewIteratorForQueuesIfNeeded();
+        
         while (areFreeSlotsAvailable() && iterator.hasNext())
         {
             occupySlot();

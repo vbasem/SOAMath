@@ -10,9 +10,12 @@ package org.soa.math.executer.task;
  */
 public class AdditionTask<T> extends Task
 {
-    T firstParam;
+    
     public AdditionTask(T paramA, T paramB)
     {
-        
+        super();
+        this.requestType = requestType.ADDITION;
+        this.addOperand(paramA);
+        this.addOperand(paramB);
     }
 }

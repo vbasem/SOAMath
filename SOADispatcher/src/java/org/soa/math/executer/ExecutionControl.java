@@ -31,7 +31,10 @@ public class ExecutionControl extends Observable implements Observer
     @Override
     public void update(Observable o, Object arg)
     {
-        arg.notify();
+        synchronized(arg)
+        {
+            arg.notify();
+        }
         setChanged();
         notifyObservers();
     }

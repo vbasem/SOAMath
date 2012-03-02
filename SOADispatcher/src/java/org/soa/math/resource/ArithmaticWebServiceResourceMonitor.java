@@ -24,7 +24,8 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     protected Map<String, ResourceCollection> usedResources = new ConcurrentHashMap();
     protected Map<String, PendingResourceRequests> pendingResourceRequests = new ConcurrentHashMap();
     protected Map registeredResourcesAvailable = new ConcurrentHashMap();
-    protected Thread monitorThread = new Thread(this);;
+    protected Thread monitorThread = new Thread(this);
+    ;
     private boolean stopMonitoring = false;
 
     @Override
@@ -47,15 +48,10 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     }
 
     @Override
-    public synchronized Resource acquireResource(String resourceType)
-    {
-        return handleTheLogicOfResourceRequest(resourceType);
-    }
-
-    protected Resource handleTheLogicOfResourceRequest(String resourceType)
+    public Resource acquireResource(String resourceType)
     {
         Resource res = getResourceWhenItBecomesAvailable(resourceType);
-        markResourceAsBusy(res, resourceType);
+        markResourceAsBusy(res);
 
         return res;
     }
@@ -105,7 +101,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         {
             getAvailableResourcesFromRegistry();
             balanceResourcesToMeetRequests();
-           // balanceResourcesToMeetRequests();
+            // balanceResourcesToMeetRequests();
 
             Thread.yield();
 
@@ -154,12 +150,12 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         {
             return res;
         }
-        
+
         // try and start a new server for the service if possible
         // the go to sleep until it comes online
         startNewResourceServerIfPossible(resourceType);
-        
-        pendingResourceRequests.get(resourceType).
+
+        getPendingRequestForType(resourceType).
                 addRequestThreadToPendingAndIncrement(Thread.currentThread());
 
         Thread currentThread = Thread.currentThread();
@@ -204,24 +200,27 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         // freeResources.get(resourceType).put(res.getResourceDescriptor(), res);
     }
 
-    private void markResourceAsBusy(Resource res, String resourceType)
+    private void markResourceAsBusy(Resource res)
     {
         //TODO: this type correct type?
+        getUsedResourceCollectionForType(res.getType().getTypeName()).put(res.getResourceDescriptor(), res);;
         //freeResources.get(resourceType).remove(res.getResourceDescriptor());
-        usedResources.get(resourceType).put(res.getResourceDescriptor(), res);
     }
 
     private void checkIfAnyRequestIsPendingForThisResourceType(Resource resource)
     {
         PendingResourceRequests pending = pendingResourceRequests.get(resource.getType().getTypeName());
 
-        if (pending.isAnyRequestPending())
+        if (pending != null && pending.isAnyRequestPending())
         {
             Thread threadWaitingForResource = pending.getPendingThreadAndDecrement();
             pending.assignResourceToThread(resource, threadWaitingForResource);
-            threadWaitingForResource.notify();
-        }
-        else
+
+            synchronized (threadWaitingForResource)
+            {
+                threadWaitingForResource.notify();
+            }
+        } else
         {
             // back into free resources if no pending
             putFreeResourceInCollection(resource);
@@ -240,8 +239,8 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
             {
                 continue;
             }
-            
-            Resource res = ResourcesFactory.getArithmaticWebServiceResource(service.getType());
+
+            Resource res = ResourcesFactory.getArithmaticWebServiceResource(service.getType(), service.getId());
             registeredResourcesAvailable.put(res.getResourceDescriptor(), res);
             res.addObserver(this);
             // check if anyone needs resource before adding it to free collection
@@ -263,8 +262,8 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     {
         String typeOfLargestFreeResourceCollection = getTypeOfLargestFreeResourceCollection();
         String typeOfLargestPendingResourceCollection = getTypeForLargestPendingResourceCollection();
-    
-        
+
+
         if (areTheCollectionsNotNull(
                 typeOfLargestFreeResourceCollection,
                 typeOfLargestPendingResourceCollection))
@@ -276,7 +275,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
                 {
                     freeResource(freeResources.get(typeOfLargestFreeResourceCollection).pop());
                     ClientFactory.getVmControlClient().startService(typeOfLargestPendingResourceCollection);
-                    
+
                 }
             }
         }
@@ -285,7 +284,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     private String getTypeOfLargestFreeResourceCollection()
     {
         Map m = new HashMap();
-        
+
         int largestFreeCollectionSize = 0;
         String largestFreeCollectionType = null;
         Iterator<Entry<String, ResourceCollection>> freeCollectionsIterator =
@@ -312,19 +311,18 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         Iterator pendingResourceItr = pendingResourceRequests.entrySet().iterator();
         String typeOfLargestPendingCollection = null;
         int sizeOfLargestCollection = 0;
-        
+
         while (pendingResourceItr.hasNext())
         {
-            Entry<String, PendingResourceRequests> pending 
-                    = (Entry<String, PendingResourceRequests>) pendingResourceItr.next();
-            
+            Entry<String, PendingResourceRequests> pending = (Entry<String, PendingResourceRequests>) pendingResourceItr.next();
+
             if (pending.getValue().getRequestCounter() > sizeOfLargestCollection)
             {
                 sizeOfLargestCollection = pending.getValue().getRequestCounter();
                 typeOfLargestPendingCollection = pending.getKey();
             }
         }
-        
+
         return typeOfLargestPendingCollection;
     }
 
@@ -334,24 +332,44 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         {
             return true;
         }
-        
+
         return false;
     }
 
     private void startNewResourceServerIfPossible(String type)
     {
-        int availableServers = 
-                SettingsRepository.
-                getConcurrencySettings().
+        int availableServers =
+                SettingsRepository.getConcurrencySettings().
                 getNumericProperty("number_of_available_machines");
-        
+
         if (registeredResourcesAvailable.size() < availableServers)
         {
             ClientFactory.getVmControlClient().startService(type);
         }
-        
+
         // how do i wait till server is up?
         // smply go into waiting, we notify the same way we do on finished resources
-        
+        // when this method returns calling thread is gona wait
+
+    }
+
+    private PendingResourceRequests getPendingRequestForType(final String resourceType)
+    {
+        if (!pendingResourceRequests.containsKey(resourceType))
+        {
+            pendingResourceRequests.put(resourceType, new PendingResourceRequests());
+        }
+
+        return pendingResourceRequests.get(resourceType);
+    }
+
+    private ResourceCollection getUsedResourceCollectionForType(final String typeName)
+    {
+        if (!usedResources.containsKey(typeName))
+        {
+            usedResources.put(typeName, new UsedResources());
+        }
+
+        return usedResources.get(typeName);
     }
 }

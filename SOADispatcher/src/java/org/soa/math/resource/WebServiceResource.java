@@ -13,8 +13,8 @@ import org.soa.math.resource.type.ResourceType;
  */
 public abstract class WebServiceResource extends Resource
 {
-    public WebServiceResource(ResourceClient client, ResourceType type)
+    public WebServiceResource(ResourceClient client, ResourceType type, String resourceDescriptor)
     {
-       super(client, type);
+       super(client, type, resourceDescriptor);
     }
 }

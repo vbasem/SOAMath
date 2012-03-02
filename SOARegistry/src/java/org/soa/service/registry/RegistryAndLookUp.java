@@ -17,7 +17,7 @@ public class RegistryAndLookUp
     public String registerArithmaticService(String identifier, String wsdlUri, String serviceType)
     {
         Logger.getLogger("registery").log(Level.INFO, "service type is {0}", new Object[]{serviceType});
-        RegisteredService service = new RegisteredServiceImpl(identifier, wsdlUri, serviceType);
+        RegisteredService service = new RegisteredService(identifier, wsdlUri, serviceType);
         Register.registerService(identifier, service);
         
         return "ok";

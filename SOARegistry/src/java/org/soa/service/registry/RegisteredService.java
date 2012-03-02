@@ -8,13 +8,36 @@ package org.soa.service.registry;
  *
  * @author Basem
  */
-public abstract class RegisteredService 
+public class RegisteredService 
 {
     public String id;
     public String url;
     public String type;
     
-    public abstract String getId();
-    public abstract String getUrl();
-    public abstract String getType();
+    public RegisteredService()
+    {
+        
+    }
+    
+    public RegisteredService(String id, String url, String type)
+    {
+        this.id = id;
+        this.url = url;
+        this.type = type;
+    }
+
+    public String getId() 
+    {
+        return id;
+    }
+
+    public String getUrl() 
+    {
+        return url;
+    }
+
+    public String getType() 
+    {
+        return type;
+    }
 }

@@ -14,7 +14,7 @@ public class VirtualMachineControlClient extends WebServiceClient
     public VirtualMachineControlClient()
     {
         super();
-        setEndPointUrl(SettingsRepository.getServicesUrlSettings().getProperty("vm_control_servic"));
+        setEndPointUrl(SettingsRepository.getServicesUrlSettings().getProperty("vm_control_service"));
         service = new org.soa.virtualmachine.webservice.VirtualMachineControlsService(getEndPointUrl(), getQname());
     }
 
