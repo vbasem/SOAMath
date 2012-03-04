@@ -1,6 +1,3 @@
-*/.project
-*/.settings
-*/.classpath
 .metadata
 /SOADispatcher/build/
 guice-3.0/
