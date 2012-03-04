@@ -22,7 +22,7 @@ public class RegistryServiceClient extends WebServiceClient
 
     public RegistryServiceClient()
     {
-        setEndPointUrl(SettingsRepository.getServicesUrlSettings().getProperty("registry_service"));
+        super(SettingsRepository.getServicesUrlSettings().getProperty("registry_service"));
         service = new org.soa.service.registry.RegistryAndLookUpService(getEndPointUrl(), getQname());
     }
 

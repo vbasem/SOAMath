@@ -66,7 +66,8 @@ public class ArithmaticStandaloneServer extends StandaloneServer
     	NetworkIpFinder ipFinder = new NetworkIpFinder();
     	String servingUrl= null;
 		try {
-			servingUrl = ipFinder.getIpAssingedByDhcpServer(parser.getDhcpserver());
+			servingUrl = "http://";
+			servingUrl += ipFinder.getIpAssingedByDhcpServer(parser.getDhcpserver());			
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -4,8 +4,8 @@
  */
 package org.soa.math.resource;
 
-import java.util.*;
 import java.util.Map.Entry;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -240,7 +240,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
                 continue;
             }
 
-            Resource res = ResourcesFactory.getArithmaticWebServiceResource(service.getType(), service.getId());
+            Resource res = ResourcesFactory.getArithmaticWebServiceResource(service);
             registeredResourcesAvailable.put(res.getResourceDescriptor(), res);
             res.addObserver(this);
             // check if anyone needs resource before adding it to free collection

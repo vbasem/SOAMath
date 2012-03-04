@@ -7,6 +7,7 @@ package org.soa.math.resource;
 import org.soa.math.global.AbstractFactory;
 import org.soa.math.resource.clients.ClientFactory;
 import org.soa.math.resource.type.ResourceType;
+import org.soa.service.registry.RegisteredService;
 
 /**
  *
@@ -37,17 +38,17 @@ public class ResourcesFactory extends AbstractFactory
     }
     
     
-    public static Resource getArithmaticWebServiceResource(String resourceTypeName, String resourceDescriptor)
+    public static Resource getArithmaticWebServiceResource(RegisteredService source)
     {
         if (isTestMode())
         {
             return null;
         }
-        ResourceType type = new ResourceType(resourceTypeName);
+        ResourceType type = new ResourceType(source.getType());
         Resource resource = new ArithmaticResource(
-                ClientFactory.getAdditionWebServiceClient(), 
+                ClientFactory.getAdditionWebServiceClient(source.getUrl()), 
                 type, 
-                resourceDescriptor);
+                source.getId());
         
         return resource;
     }

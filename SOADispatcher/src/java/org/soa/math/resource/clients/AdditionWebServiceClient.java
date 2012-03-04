@@ -20,6 +20,11 @@ public class AdditionWebServiceClient extends WebServiceClient implements Resour
 
     private services.arithmatic.AdditionServiceService service;
 
+    public AdditionWebServiceClient(String url)
+    {
+        super(url);
+    }
+       
     @Override
     public QName getDefaultQname()
     {

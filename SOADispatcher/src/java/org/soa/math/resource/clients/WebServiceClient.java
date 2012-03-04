@@ -21,6 +21,12 @@ public abstract class WebServiceClient
     protected QName qname = null;
 
     public abstract QName getDefaultQname();
+    
+    public WebServiceClient(String url)
+    {
+        this.setEndPointUrl(url);
+    }
+    
 
     public void setQname(QName qname)
     {
