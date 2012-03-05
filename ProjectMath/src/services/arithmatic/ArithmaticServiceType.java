@@ -10,7 +10,7 @@ package services.arithmatic;
  */
 public enum ArithmaticServiceType
 {
-    ADDITION, SUBSTRACTION, MULTIPLICATION, DIVISION;
+    ADDITION,  SUBSTRACTION, MULTIPLICATION, DIVISION;
 
 }
 

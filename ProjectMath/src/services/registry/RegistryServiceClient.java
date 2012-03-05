@@ -3,10 +3,11 @@ package services.registry;
 
 import java.io.Closeable;
 import java.io.IOException;
-import javax.xml.ws.WebServiceRef;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-import org.soa.service.registry.RegistryAndLookUpService;
-import org.soa.service.registry.ServiceType;
+import javax.xml.namespace.QName;
+import javax.xml.ws.WebServiceRef;
 
 
 public class RegistryServiceClient implements Publishable
@@ -21,17 +22,34 @@ public class RegistryServiceClient implements Publishable
 
 	public RegistryServiceClient(String serviceId, String serviceUrl, String serviceType)
 	{
-		service = new RegistryAndLookUpService();
 		this.serviceId = serviceId;
 		this.serviceUrl = serviceUrl;
 		this.serviceType = serviceType;
 
 	}
 
-	@Override
-	public void publish()
+	protected QName getQname()
 	{
+		return new QName("http://registry.service.soa.org/", "RegistryAndLookUpService");
+	}
 
+	protected URL getUrl(String url)
+	{
+        URL endPoint = null;
+		try {
+			endPoint = new URL(url);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return endPoint;
+	}
+
+	@Override
+	public void publish(String registryServer)
+	{
+		service = new org.soa.service.registry.RegistryAndLookUpService(getUrl("http://192.168.56.1:8080/SOARegistry/RegistryAndLookUpService"), getQname());
 		org.soa.service.registry.RegistryAndLookUp port = service.getRegistryAndLookUpPort();
 		port.registerArithmaticService(serviceId, serviceUrl, serviceType);
 
