@@ -2,14 +2,10 @@
 package services.server;
 
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
 
 import services.registry.RegistryServiceClient;
 import utils.ArgumentParser;
 import utils.networking.NetworkIpFinder;
-
-import org.soa.service.registry.ServiceType;
 
 public class ArithmaticStandaloneServer extends StandaloneServer
 {
@@ -36,9 +32,10 @@ public class ArithmaticStandaloneServer extends StandaloneServer
         parser = new ArgumentParser(args);
         publisher = new RegistryServiceClient(
         		parser.getServiceId(),
-        		getServingUrl(),
+        		getCompleteServerUrl(),
         		parser.getServiceTypeEnumeration().toString());
-        publisher.publish();
+
+        publisher.publish(parser.getRegisterServer());
     }
 
     protected void abortIfNotEnoughArguments(String[] args)
@@ -66,8 +63,7 @@ public class ArithmaticStandaloneServer extends StandaloneServer
     	NetworkIpFinder ipFinder = new NetworkIpFinder();
     	String servingUrl= null;
 		try {
-			servingUrl = "http://";
-			servingUrl += ipFinder.getIpAssingedByDhcpServer(parser.getDhcpserver());			
+			servingUrl = ipFinder.getIpAssingedByDhcpServer(parser.getDhcpserver());
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
