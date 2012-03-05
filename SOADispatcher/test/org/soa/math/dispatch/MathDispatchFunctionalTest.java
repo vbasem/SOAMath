@@ -40,10 +40,14 @@ public class MathDispatchFunctionalTest {
     @Test
     public void add_validNumbers_additionResult()
     {
+        Integer a = 3;
+        Integer b = 1;
+        Integer result = 4;
+        
         MathDispatch dispatcher = new MathDispatch();
         try
         {
-            assertEquals(4, dispatcher.add(1, 3));
+            assertEquals(result, dispatcher.add(a, b));
         } catch (InterruptedException ex)
         {
             Logger.getLogger(MathDispatchFunctionalTest.class.getName()).log(Level.SEVERE, null, ex);
