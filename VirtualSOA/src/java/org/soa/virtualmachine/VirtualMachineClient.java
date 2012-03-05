@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Singleton;
+import org.soa.virtualmachine.config.SettingsRepository;
 import org.virtualbox_4_1.*;
 
 public class VirtualMachineClient extends Thread
@@ -15,8 +16,6 @@ public class VirtualMachineClient extends Thread
 
     private static VirtualMachineClient singleton = null;
     private boolean keep_alive = false;
-    public static final String VBOX_HOST = "http://localhost";
-    public static final String VBOX_PORT = "18083";
     private VirtualBoxManager manager;
     private IVirtualBox box;
 
@@ -57,7 +56,8 @@ public class VirtualMachineClient extends Thread
         arithmaticCommand.add("services.server.ArithmaticStandaloneServer");
         arithmaticCommand.add("--dhcp=" + dhcpIp);
         arithmaticCommand.add("--servicemode=" + mode);
-        arithmaticCommand.add("--registerserver=" + "192.168.56.1");
+        arithmaticCommand.add("--registerserver=" +
+                SettingsRepository.getServicesUrlSettings().getProperty("registry_service_url"));
         arithmaticCommand.add("--id=" + id);
 
         Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, arithmaticCommand.toString(), arithmaticCommand);
@@ -173,7 +173,7 @@ public class VirtualMachineClient extends Thread
 
         manager = VirtualBoxManager.createInstance(null);
 
-        manager.connect(VBOX_HOST + ":" + VBOX_PORT, null, null);
+        manager.connect(SettingsRepository.getServicesUrlSettings().getProperty("vbox_service_url"), null, null);
         box = manager.getVBox();
     }
 
