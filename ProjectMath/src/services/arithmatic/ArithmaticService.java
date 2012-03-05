@@ -3,5 +3,5 @@ package services.arithmatic;
 
 public interface ArithmaticService
 {
-    public int calculate(int x, int y);
+    public <T> T calculate(T x, T y);
 }

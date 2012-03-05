@@ -1,19 +1,23 @@
 package services.arithmatic;
 
 import javax.jws.WebService;
+import com.stefanmuenchow.arithmetic.Arithmetic;
 
 
 @WebService()
 public class AdditionService implements ArithmaticService
 {
-    private int add(int x, int y)
+    private <T> T add(T x, T y)
     {
-        return x+y;
+		Arithmetic ar = new Arithmetic<Number>((Number) x);
+
+		return (T) ar.add((Number) y).value();
     }
 
-    public int calculate(int x, int y)
+    public <T> T calculate(T x, T y)
     {
-    	System.out.println(String.format("adding %d + %d", x, y));
-        return add(x, y);
+    	System.out.println("adding " +  x + " to " + y);
+
+    	return add(x, y);
     }
 }
