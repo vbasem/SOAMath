@@ -1,7 +1,5 @@
 package functional;
 
-import static org.junit.Assert.*;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,7 +7,7 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
-
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class TestArithmaticServer
@@ -20,12 +18,26 @@ public class TestArithmaticServer
     private services.arithmatic.AdditionServiceService service;
 
     @Test
-    public void performArithmaticOperation()
+    public void performArithmaticOperation_intType()
     {
-        assertEquals(5, add(2, 3));
+        int a = 2;
+        int b = 3;
+        Integer result = 5;
+        
+        assertEquals(result, add(a, b));
+    }
+    
+    @Test
+    public void performArithmaticOperation_doubleType()
+    {
+        Double a = 2.04;
+        Double b = 2.06;
+        Double result = 4.1;
+        double y = (Double) add(a, b);
+        assertEquals(result, (Double) add(a, b));
     }
 
-    protected int add(int x, int y)
+    protected <T> T add(T x, T y)
     {
         try
         {
@@ -39,7 +51,7 @@ public class TestArithmaticServer
         
 
         services.arithmatic.AdditionService port = service.getAdditionServicePort();
-        int additionResult = port.calculate(x, y);
+        Object additionResult =  port.calculate(x, y);
 
         try
         {
@@ -50,6 +62,6 @@ public class TestArithmaticServer
             e.printStackTrace();
         }
 
-        return additionResult;
+        return (T) additionResult;
     }
 }

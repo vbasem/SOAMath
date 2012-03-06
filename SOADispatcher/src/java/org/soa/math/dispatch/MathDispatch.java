@@ -28,11 +28,11 @@ public class MathDispatch implements Observer
         ResourcesFactory.getStaticArithmaticResourceMonitor().startMonitor();
     }
     @WebMethod(operationName="add")
-    public int add(int x, int y) throws InterruptedException, ExecutionException
+    public <T> T add(T x, T y) throws InterruptedException, ExecutionException
     {
         Task t = TaskFactory.createAdditionTask(x, y);
-        String result = (String) getFutureResultFromTask(t).get();
-        return Integer.getInteger(result);
+        return (T) getFutureResultFromTask(t).get();
+        //return Integer.getInteger(result);
     }
     
     @WebMethod(operationName="multiply")
