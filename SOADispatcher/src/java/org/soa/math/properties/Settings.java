@@ -18,23 +18,12 @@ public class Settings
 {
 
     private Properties properties = null;
-    private String properties_file_name = "properties.ini";
-    private String properties_folder_name = "resources";
+    private String properties_file_name = null;
 
     public void initializeProperties()
     {
         PropertiesLoader loader = new PropertiesLoader();
-        try
-        {
-            properties = loader.loadFromFilePath(new File("C:\\math\\SOAMath\\SOADispatcher").getCanonicalPath()
-                    + File.separator
-                    + properties_folder_name
-                    + File.separator
-                    + properties_file_name);
-        } catch (IOException ex)
-        {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
-        }
+        properties = loader.loadFromFilePath(properties_file_name);
     }
 
     public String getProperty(String key)
@@ -56,7 +45,7 @@ public class Settings
         {
             initializeProperties();
         }
-        
+
         return this;
     }
 

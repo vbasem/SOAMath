@@ -83,6 +83,7 @@ public abstract class Resource extends Observable
     protected void signalAvailableResource()
     {
         this.setBusyStatus(false);
+        this.setChanged();
         this.notifyObservers();
     }
 }

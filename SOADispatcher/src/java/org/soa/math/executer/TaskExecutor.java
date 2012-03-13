@@ -6,8 +6,8 @@ package org.soa.math.executer;
 
 import java.util.Observable;
 import org.soa.math.executer.task.Task;
-import org.soa.math.request.RequestType;
 import org.soa.math.resource.Resource;
+import org.soa.math.resource.ResourceMonitor;
 import org.soa.math.resource.ResourcesFactory;
 
 /**
@@ -29,9 +29,17 @@ public abstract class TaskExecutor extends Observable implements Runnable
     
     public Resource acquireResource()
     {
-        return ResourcesFactory.getStaticArithmaticResourceMonitor().acquireResource(task.requestType.toString());
+        String wantedResourceType = task.requestType.toString();
+        
+        ResourceMonitor monitor = ResourcesFactory.getStaticArithmaticResourceMonitor();
+        
+        return monitor.acquireResource(wantedResourceType);
     }
     
+    /**
+     * when done informs the execution control (observer)
+     * 
+     */
     public void triggerTaskCompletedEvent()
     {
         this.setChanged();

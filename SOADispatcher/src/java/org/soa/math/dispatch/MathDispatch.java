@@ -27,20 +27,20 @@ public class MathDispatch implements Observer
         QueueFactory.getStaticQueueMonitor().startMonitor();
         ResourcesFactory.getStaticArithmaticResourceMonitor().startMonitor();
     }
+    
     @WebMethod(operationName="add")
     public <T> T add(T x, T y) throws InterruptedException, ExecutionException
     {
         Task t = TaskFactory.createAdditionTask(x, y);
         return (T) getFutureResultFromTask(t).get();
-        //return Integer.getInteger(result);
     }
     
     @WebMethod(operationName="multiply")
-    public int multiply(int x, int y)
+    public <T> T multiply(T x, T y)
     {
         //Task t = createTask(RequestType.MULTIPLICATION, x, y);
         //dispatchTask(t);
-        return 0;
+        return null;
     }
     
     private Future getFutureResultFromTask(Task t)

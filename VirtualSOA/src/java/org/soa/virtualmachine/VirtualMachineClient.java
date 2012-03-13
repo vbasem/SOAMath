@@ -52,12 +52,12 @@ public class VirtualMachineClient extends Thread
         String dhcpIp = box.getDHCPServers().get(0).getIPAddress();
         List<String> arithmaticCommand = new ArrayList<String>();
         arithmaticCommand.add("-cp");
-        arithmaticCommand.add("/home/basemv/SOAMath/ProjectMath/bin/:/home/basemv/SOAMath/ProjectMath/jax-ws/");
+        arithmaticCommand.add("/home/basemv/SOAMath/ProjectMath/bin/:/home/basemv/SOAMath/ProjectMath/jax-ws/:/home/basemv/SOAMath/ProjectMath/lib/Generic-Arithmetic-1.0.0.jar");
         arithmaticCommand.add("services.server.ArithmaticStandaloneServer");
         arithmaticCommand.add("--dhcp=" + dhcpIp);
         arithmaticCommand.add("--servicemode=" + mode);
-        arithmaticCommand.add("--registerserver=" +
-                SettingsRepository.getServicesUrlSettings().getProperty("registry_service_url"));
+        arithmaticCommand.add("--registerserver="
+                + SettingsRepository.getServicesUrlSettings().getProperty("registry_service_url"));
         arithmaticCommand.add("--id=" + id);
 
         Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, arithmaticCommand.toString(), arithmaticCommand);
@@ -127,9 +127,17 @@ public class VirtualMachineClient extends Thread
     {
         if (manager != null)
         {
-            manager.cleanup();;
-            manager.disconnect();
-            manager = null;
+            try
+            {
+                manager.cleanup();
+                manager.disconnect();
+            } catch (Exception ex)
+            {
+                Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);
+            } finally
+            {
+                manager = null;
+            }
         }
 
         return "resetting vm <br />";

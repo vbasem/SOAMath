@@ -11,42 +11,54 @@ import static org.junit.Assert.*;
  *
  * @author Basem
  */
-public class DispatcherSettingsTest {
-    
+public class DispatcherSettingsTest
+{
+
     private static final String PROPERTIES_FILE_NAME = "properties_for_tests.ini";
     private static final String TEST_PROPERTY_KEY = "test_key";
     private static final String TEST_PROPERTY_VALUE = "test_value";
-    
-    public DispatcherSettingsTest() {
+    private Settings settingsInstance;
+
+    public DispatcherSettingsTest()
+    {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() throws Exception
+    {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() throws Exception
+    {
     }
-    
+
     @Before
-    public void setUp() {
+    public void setUp()
+    {
+        settingsInstance = new Settings();
     }
-    
+
     @After
-    public void tearDown() {
-        Settings.resetProperties();
+    public void tearDown()
+    {
+        settingsInstance.resetProperties();
     }
 
     /**
      * Test of getProperty method, of class Settings.
      */
     @Test
-    public void testGetProperty() {
+    public void testGetProperty()
+    {
         System.out.println("getProperty");
         String key = TEST_PROPERTY_KEY;
         String expResult = TEST_PROPERTY_VALUE;
-        Settings.setPropertiesFileName(PROPERTIES_FILE_NAME);
-        String result = Settings.getProperty(key);
+
+        settingsInstance.setPropertyFileName(PROPERTIES_FILE_NAME);
+        
+        String result = settingsInstance.getProperty(key);
+        
         assertEquals(expResult, result);
     }
 }
