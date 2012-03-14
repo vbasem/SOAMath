@@ -119,6 +119,6 @@ public class MathParser
     
     public static void main(String[] args)
     {
-        System.out.println(MathParser.processEquation("2+3*7/2-1"));
+        System.out.println(MathParser.processEquation("(2+)3*7/2-1"));
     }
 }
