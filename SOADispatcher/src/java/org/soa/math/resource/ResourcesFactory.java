@@ -4,6 +4,7 @@
  */
 package org.soa.math.resource;
 
+import java.util.HashMap;
 import org.soa.math.global.AbstractFactory;
 import org.soa.math.resource.clients.ClientFactory;
 import org.soa.math.resource.type.ResourceType;

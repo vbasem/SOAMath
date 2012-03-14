@@ -32,35 +32,25 @@ public class QueueMonitor implements Monitor, Runnable
         while (!stopMonitorThread)
         {
             fetchNewTaskRoundRobin();
-            
-            synchronized(monitoringThread)
+            try
             {
-                try
-                {
-                    monitoringThread.wait();
-                } catch (InterruptedException ex)
-                {
-                    Logger.getLogger(QueueMonitor.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                monitoringThread.sleep(100);
+            } catch (InterruptedException ex)
+            {
+                Logger.getLogger(QueueMonitor.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
     @Override
     public void startMonitor()
-    {
+    { 
         if (!monitoringThread.isAlive())
         {
             Logger.getLogger(QueueMonitor.class.getName()).log(Level.WARNING, "starting queue monitor");
             monitoringThread.start();
         }
-        else
-        {
-            synchronized(monitoringThread)
-            {
-                monitoringThread.notify();
-            }
-        }
+
     }
     
     @Override
@@ -73,10 +63,7 @@ public class QueueMonitor implements Monitor, Runnable
     public void update(Observable o, Object arg)
     {
         freeSlot();
-        synchronized(monitoringThread)
-        {
-            monitoringThread.notify();
-        }
+        fetchNewTaskRoundRobin();
     }
     
     protected void fetchNewTaskRoundRobin()
@@ -96,7 +83,7 @@ public class QueueMonitor implements Monitor, Runnable
     {
         if (itr == null || !itr.hasNext())
         {
-            itr =  QueueFactory.getStaticRequestQueue().iterator();
+            itr = QueueFactory.getStaticRequestQueue().iterator();
         }
         
         return itr;

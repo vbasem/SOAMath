@@ -35,18 +35,19 @@ public class AdditionWebServiceClient extends WebServiceClient implements Resour
     public void execute(Task task)
     {
         Iterator itr = task.getTaskOperands().iterator();
-        int result = add((Integer) itr.next(), (Integer) itr.next());
-        task.setResult(result);
+        task.setResult(
+                add((Integer) itr.next(), (Integer) itr.next())
+                );
     }
 
-    protected int add(int x, int y)
+    protected <T> T add(T x, T y)
     {
         service = new services.arithmatic.AdditionServiceService(getEndPointUrl(), getQname());
 
         services.arithmatic.AdditionService port = service.getAdditionServicePort();
 
-        int additionResult = port.calculate(x, y);
-
+        Object result = port.calculate(x, y);
+        
         try
         {
             ((Closeable) port).close();
@@ -55,7 +56,7 @@ public class AdditionWebServiceClient extends WebServiceClient implements Resour
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-        return additionResult;
+        
+        return (T) result;
     }
 }

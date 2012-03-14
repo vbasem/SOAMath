@@ -4,20 +4,19 @@
  */
 package org.soa.math.queue;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.*;
 import javax.el.MethodNotFoundException;
 import org.soa.math.executer.task.Task;
-import org.soa.math.properties.Settings;
 import org.soa.math.request.RequestType;
 
 /**
  *
  * @author Basem
  */
-public class RequestQueue extends HashMap implements TaskQueue, Iterable
+public class RequestQueue extends ConcurrentHashMap implements TaskQueue, Iterable
 {
-
     private ExecutorService taskFutureExecuter = Executors.newCachedThreadPool();
 
     @Override
@@ -27,6 +26,7 @@ public class RequestQueue extends HashMap implements TaskQueue, Iterable
         Future futureResult = createFutureForTask(t);
         addTaskToQueue(t);
         notifyQueueMonitor();
+        
         return futureResult;
     }
 
@@ -73,6 +73,7 @@ public class RequestQueue extends HashMap implements TaskQueue, Iterable
         private Set mapKeys;
         private Iterator keySetIterator;
         private RequestQueue queue; 
+        private RequestType nextIterationKey = null;
         
         public Itr(RequestQueue q)
         {
@@ -81,16 +82,45 @@ public class RequestQueue extends HashMap implements TaskQueue, Iterable
             keySetIterator = mapKeys.iterator();
         }
         
+        /**
+         * check first if we have more request type queues
+         * next check if that queue has any elements.
+         * @return 
+         */
         @Override
         public boolean hasNext()
         {
-            return keySetIterator.hasNext();
+            boolean hasNext = false;
+            boolean nextQueueAvailable = false;
+            
+            while(!hasNext)
+            {
+                nextQueueAvailable = keySetIterator.hasNext();
+                
+                if (nextQueueAvailable)
+                {
+                    nextIterationKey = (RequestType) keySetIterator.next();
+
+                    if (queue.getQueueForRequestType(nextIterationKey).size() > 0)
+                    {
+                        hasNext = true;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+            return hasNext;
         }
 
         @Override
         public Object next()
         {
-            return queue.getQueueForRequestType((RequestType) keySetIterator.next()).poll();
+            Object task = queue.getQueueForRequestType(nextIterationKey).poll();
+
+            return task;
         }
 
         @Override

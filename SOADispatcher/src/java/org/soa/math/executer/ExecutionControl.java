@@ -4,9 +4,9 @@
  */
 package org.soa.math.executer;
 
-import org.soa.math.executer.task.Task;
 import java.util.Observable;
 import java.util.Observer;
+import org.soa.math.executer.task.Task;
 
 /**
  *
@@ -16,10 +16,9 @@ public class ExecutionControl extends Observable implements Observer
 {
     public void startExecuterWithTask(Task task)
     {
-        TaskExecutor exec = new ThreadedTaskExecutor(task);
+        TaskExecutor exec = ExecutorFactory.getThreadedTaskExecutor(task);
         exec.addObserver(this);
-        Thread t = new Thread(exec);
-        t.start();
+        exec.execute();
     }
     
     /**

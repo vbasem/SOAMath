@@ -28,7 +28,7 @@ public class ThreadedTaskExecutor extends TaskExecutor implements Runnable
     public void run()
     {
         resource = acquireResource();
-        resource.getClient().execute(task);
+        resource.assignTaskToResource(task);
         //we are done, time to notifier observers
         triggerTaskCompletedEvent();
     }

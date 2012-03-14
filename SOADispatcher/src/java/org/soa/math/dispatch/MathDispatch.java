@@ -9,11 +9,15 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.jws.WebService;
 import org.soa.math.executer.task.Task;
 import org.soa.math.queue.QueueFactory;
 import org.soa.math.resource.ResourcesFactory;
+import sun.text.normalizer.UCharacter;
 
 /**
  *
@@ -27,20 +31,22 @@ public class MathDispatch implements Observer
         QueueFactory.getStaticQueueMonitor().startMonitor();
         ResourcesFactory.getStaticArithmaticResourceMonitor().startMonitor();
     }
+    
     @WebMethod(operationName="add")
-    public <T> T add(T x, T y) throws InterruptedException, ExecutionException
+    public <T> T add( T x, T y) throws InterruptedException, ExecutionException
     {
-        Task t = TaskFactory.createAdditionTask(x, y);
+        Number  s = (Number)(x);
+        Number  z = (Number)(y);
+        Task t = TaskFactory.createAdditionTask(s, z);
         return (T) getFutureResultFromTask(t).get();
-        //return Integer.getInteger(result);
     }
     
     @WebMethod(operationName="multiply")
-    public int multiply(int x, int y)
+    public <T> T multiply(T x, T y)
     {
         //Task t = createTask(RequestType.MULTIPLICATION, x, y);
         //dispatchTask(t);
-        return 0;
+        return null;
     }
     
     private Future getFutureResultFromTask(Task t)

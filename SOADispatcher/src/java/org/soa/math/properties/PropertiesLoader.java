@@ -13,24 +13,22 @@ import java.util.logging.Logger;
  *
  * @author Basem
  */
-public class PropertiesLoader {
+public class PropertiesLoader
+{
 
-    public Properties loadFromFilePath(String filePath) {
-        Reader r;
+    public Properties loadFromFilePath(String configFileName)
+    {
         Properties p = new Properties();
-        
-        try {
-            r = new FileReader(filePath);
-            
-            try {
-                p.load(r);
-            } catch (IOException ex) {
-                Logger.getLogger(PropertiesLoader.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (FileNotFoundException ex) {
+        InputStream configSource = this.getClass().getResourceAsStream(configFileName);
+
+        try
+        {
+            p.load(configSource);
+        } catch (IOException ex)
+        {
             Logger.getLogger(PropertiesLoader.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return p;
     }
 }
