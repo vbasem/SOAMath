@@ -2,9 +2,9 @@ package lib;
 
 import org.junit.Test;
 
-import com.stefanmuenchow.arithmetic.Arithmetic;
-
 import static org.junit.Assert.*;
+
+import com.stefanmuenchow.arithmetic.Arithmetic;
 
 public class GenericArithmaticTests
 {
