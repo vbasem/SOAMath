@@ -1,6 +1,9 @@
 package services.arithmatic;
 
 import javax.jws.WebService;
+
+import utls.logging.ServiceLogger;
+
 import com.stefanmuenchow.arithmetic.Arithmetic;
 
 
@@ -16,7 +19,7 @@ public class AdditionService implements ArithmaticService
 
     public <T> T calculate(T x, T y)
     {
-    	System.out.println("adding " +  x + " to " + y);
+    	ServiceLogger.getLogger().info("adding " +  x + " to " + y);
 
     	return add(x, y);
     }

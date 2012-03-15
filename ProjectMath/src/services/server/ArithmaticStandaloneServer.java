@@ -6,6 +6,7 @@ import java.net.SocketException;
 import services.registry.RegistryServiceClient;
 import utils.ArgumentParser;
 import utils.networking.NetworkIpFinder;
+import utls.logging.ServiceLogger;
 
 public class ArithmaticStandaloneServer extends StandaloneServer
 {
@@ -19,10 +20,10 @@ public class ArithmaticStandaloneServer extends StandaloneServer
 			server.startServingForever();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		}
     }
 
@@ -42,7 +43,7 @@ public class ArithmaticStandaloneServer extends StandaloneServer
     {
         if (args.length < 2)
         {
-            System.out.println("not enough arguments to start server");
+            ServiceLogger.getLogger().severe("not enough arguments to start server");
             System.exit(1);
         }
     }
@@ -53,7 +54,7 @@ public class ArithmaticStandaloneServer extends StandaloneServer
 			return parser.getServiceMode();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		}
 		return null;
     }
@@ -66,10 +67,10 @@ public class ArithmaticStandaloneServer extends StandaloneServer
 			servingUrl = ipFinder.getIpAssingedByDhcpServer(parser.getDhcpserver());
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		}
         return servingUrl;
     }
@@ -83,7 +84,7 @@ public class ArithmaticStandaloneServer extends StandaloneServer
 			id = parser.getServiceId();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		}
 
     	return id;

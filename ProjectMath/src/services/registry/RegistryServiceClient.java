@@ -9,11 +9,13 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceRef;
 
+import utls.logging.ServiceLogger;
+
 
 public class RegistryServiceClient implements Publishable
 {
 
-	@WebServiceRef(wsdlLocation="http://192.168.56.1:8080/SOARegistry/RegistryAndLookUpService?wsdl")
+	//@WebServiceRef(wsdlLocation="http://192.168.56.1:8080/SOARegistry/RegistryAndLookUpService?wsdl")
 	private org.soa.service.registry.RegistryAndLookUpService service;
 
 	private String serviceId;
@@ -23,7 +25,7 @@ public class RegistryServiceClient implements Publishable
 	public RegistryServiceClient(String serviceId, String serviceUrl, String serviceType)
 	{
 		this.serviceId = serviceId;
-		this.serviceUrl = serviceUrl;
+		this.serviceUrl = serviceUrl + "?wsdl";
 		this.serviceType = serviceType;
 
 	}
@@ -40,7 +42,7 @@ public class RegistryServiceClient implements Publishable
 			endPoint = new URL(url);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		}
 
 		return endPoint;
@@ -57,7 +59,7 @@ public class RegistryServiceClient implements Publishable
 			((Closeable) port).close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		}
 
 	}

@@ -33,10 +33,10 @@ public class ServiceLogger extends Logger
 			logHandler = new FileHandler(getLogFilePath());
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ServiceLogger.getLogger().warning(e.toString());
 		}
 
 		logHandler.setFormatter(new SimpleFormatter());
