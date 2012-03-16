@@ -33,12 +33,12 @@ public class MathDispatch implements Observer
     }
     
     @WebMethod(operationName="add")
-    public <T> T add( T x, T y) throws InterruptedException, ExecutionException
+    public String add(String x, String y) throws InterruptedException, ExecutionException
     {
-        Number  s = (Number)(x);
-        Number  z = (Number)(y);
-        Task t = TaskFactory.createAdditionTask(s, z);
-        return (T) getFutureResultFromTask(t).get();
+         //Logger.getLogger("asd").severe("" + x.toString()+ y.toString());
+        
+        Task t = TaskFactory.createAdditionTask(x, y);
+        return (String) getFutureResultFromTask(t).get();
     }
     
     @WebMethod(operationName="multiply")

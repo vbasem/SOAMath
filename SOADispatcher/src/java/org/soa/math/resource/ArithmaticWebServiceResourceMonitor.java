@@ -101,7 +101,6 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         {
             getAvailableResourcesFromRegistry();
             balanceResourcesToMeetRequests();
-            // balanceResourcesToMeetRequests();
 
             Thread.yield();
 
@@ -150,7 +149,6 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         {
             return res;
         }
-
         // try and start a new server for the service if possible
         // the go to sleep until it comes online
         startNewResourceServerIfPossible(resourceType);
