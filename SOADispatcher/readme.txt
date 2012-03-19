@@ -1,0 +1,1 @@
+java -cp .;jax-ws;build\web\WEB-INF\classes;lib\javaee.jar;C:\glassfish3\glassfish\modules\* org.soa.math.dispatch.server.DispatcherServer 192.168.56.1

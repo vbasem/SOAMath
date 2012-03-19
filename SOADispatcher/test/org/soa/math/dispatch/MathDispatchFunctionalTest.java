@@ -44,9 +44,9 @@ public class MathDispatchFunctionalTest
     @Test
     public void add_validNumbers_additionResult()
     {
-        final Integer a = 3;
-        final Integer b = 1;
-        final Integer result = 4;
+        final String a = "3";
+        final String b = "1";
+        final String result = "4";
 
         final MathDispatch dispatcher = new MathDispatch();
 
