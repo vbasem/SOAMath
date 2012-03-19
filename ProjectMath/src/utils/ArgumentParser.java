@@ -81,6 +81,12 @@ public class ArgumentParser
         {
             case ADDITION:
                 return new AdditionService();
+            case SUBSTRACTION:
+            	return new SubstractionService();
+            case MULTIPLICATION:
+            	return new MultiplicationService();
+            case DIVISION:
+            	return new DivisionService();
             default:
                 return null;
         }

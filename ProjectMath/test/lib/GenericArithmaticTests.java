@@ -1,5 +1,7 @@
 package lib;
 
+import java.util.Scanner;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -39,5 +41,17 @@ public class GenericArithmaticTests
 		Arithmetic ar = new Arithmetic<Number>(a);
 
 		assertEquals(result, ar.add(b).value());
+	}
+
+	@Test
+	public void addTwoStrings_returnsNumberInStringFormat()
+	{
+		String a =  "1";
+		String b = "2";
+		String result = "3";
+		Scanner sc = new Scanner(a);
+		//sc.n
+		//Arithmetic ar = new Arithmetic<Number>();
+
 	}
 }
