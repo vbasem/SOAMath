@@ -10,5 +10,5 @@ package org.soa.math.request;
  */
 public enum RequestType
 {
-    ADDITION, MULTIPLICATION;
+    ADDITION, MULTIPLICATION, SUBSTRACTION, DIVISION;
 }

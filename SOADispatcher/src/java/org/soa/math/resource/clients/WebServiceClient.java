@@ -4,6 +4,9 @@
  */
 package org.soa.math.resource.clients;
 
+import org.soa.math.resource.clients.arithmatic.ArithmaticWebServiceClient;
+import java.io.Closeable;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -21,12 +24,11 @@ public abstract class WebServiceClient
     protected QName qname = null;
 
     public abstract QName getDefaultQname();
-    
+
     public WebServiceClient(String url)
     {
         this.setEndPointUrl(url);
     }
-    
 
     public void setQname(QName qname)
     {
@@ -60,7 +62,18 @@ public abstract class WebServiceClient
         {
             throw new InstantiationError("the url needs to be set before service can be used");
         }
-        
+
         return endPoint;
+    }
+
+    protected void closePort(Closeable port)
+    {
+        try
+        {
+            port.close();
+        } catch (IOException ex)
+        {
+            Logger.getLogger(ArithmaticWebServiceClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

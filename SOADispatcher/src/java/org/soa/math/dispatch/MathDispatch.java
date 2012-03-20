@@ -28,43 +28,54 @@ import sun.text.normalizer.UCharacter;
 @WebService()
 public class MathDispatch implements Observer
 {
-    public MathDispatch()
+    @WebMethod(operationName = "add")
+    public String add(@WebParam(name="operand1") String operand1, @WebParam(name="operand2") String operand2) throws InterruptedException, ExecutionException, ParseException
     {
+        Task t = TaskFactory.createAdditionTask(getNumber(operand1), getNumber(operand2));
 
-    }
-    
-    @WebMethod(operationName="add")
-    public String add(String x, String y) throws InterruptedException, ExecutionException, ParseException
-    {
-        Number a = NumberFormat.getInstance().parse(x);
-        Number b = NumberFormat.getInstance().parse(y);
-
-        Logger.getLogger("asd").severe("" + x.toString() + " " + y.toString());
-
-        Task t = TaskFactory.createAdditionTask(a, b);
-        
         return getFutureResultFromTask(t).get().toString();
     }
-    
-    @WebMethod(operationName="multiply")
-    public <T> T multiply(T x, T y)
+
+    @WebMethod(operationName = "multiply")
+    public String multiply(String x, String y) throws InterruptedException, ExecutionException, ParseException
     {
-        //Task t = createTask(RequestType.MULTIPLICATION, x, y);
-        //dispatchTask(t);
-        return null;
-    }
-    
-    private Future getFutureResultFromTask(Task t)
-    {
-        Future futureResult = 
-                QueueFactory.
-                getStaticRequestQueue().
-                putToQueueAndGetFeatureObject(t);
-        
-        return futureResult;
-        
+        Task t = TaskFactory.createMultiplicationTask(getNumber(x), getNumber(y));
+
+        return getFutureResultFromTask(t).get().toString();
     }
 
+    @WebMethod(operationName = "divide")
+    public String divide(String x, String y) throws InterruptedException, ExecutionException, ParseException
+    {
+        Task t = TaskFactory.createDivisionTask(getNumber(x), getNumber(y));
+
+        return getFutureResultFromTask(t).get().toString();
+    }
+
+    @WebMethod(operationName = "substract")
+    public String substract(String x, String y) throws InterruptedException, ExecutionException, ParseException
+    {
+        Task t = TaskFactory.createSubstractionTask(getNumber(x), getNumber(y));
+
+        return getFutureResultFromTask(t).get().toString();
+    }
+
+    private Number getNumber(String stringNumber) throws ParseException
+    {
+        return NumberFormat.getInstance().parse(stringNumber);
+    }
+
+    private Future getFutureResultFromTask(Task t)
+    {
+        Future futureResult =
+                QueueFactory.getStaticRequestQueue().
+                putToQueueAndGetFeatureObject(t);
+
+        return futureResult;
+
+    }
+    
+    @WebMethod(exclude=true)
     @Override
     public void update(Observable o, Object arg)
     {

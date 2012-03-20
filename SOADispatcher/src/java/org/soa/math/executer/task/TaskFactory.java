@@ -14,13 +14,24 @@ import org.soa.math.global.AbstractFactory;
  */
 public class TaskFactory extends AbstractFactory
 {
+
     public static <T> Task createAdditionTask(T x, T y)
     {
         return new AdditionTask(x, y);
     }
-    
+
     public static <T> Task createMultiplicationTask(T x, T y)
     {
-        return null;
+        return new MultiplicationTask(x, y);
+    }
+
+    public static <T> Task createDivisionTask(T x, T y)
+    {
+        return new DivisionTask(x, y);
+    }
+
+    public static <T> Task createSubstractionTask(T x, T y)
+    {
+        return new SubstractionTask(x, y);
     }
 }

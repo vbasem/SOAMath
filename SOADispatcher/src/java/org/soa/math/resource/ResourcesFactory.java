@@ -47,7 +47,7 @@ public class ResourcesFactory extends AbstractFactory
         }
         ResourceType type = new ResourceType(source.getType());
         Resource resource = new ArithmaticResource(
-                ClientFactory.getAdditionWebServiceClient(source.getUrl()), 
+                ClientFactory.getArithmaticWebServiceClient(source.getUrl(), source.getType()), 
                 type, 
                 source.getId());
         
