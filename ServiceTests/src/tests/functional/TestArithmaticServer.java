@@ -41,7 +41,7 @@ public class TestArithmaticServer
     {
         try
         {
-            URL endPoint = new URL("http://192.168.56.105:9002/");
+            URL endPoint = new URL("http://192.168.56.106:9002/?wsdl");
             QName gname = new QName("http://arithmatic.services/", "AdditionServiceService");
             service = new services.arithmatic.AdditionServiceService(endPoint, gname);
         } catch (MalformedURLException ex)

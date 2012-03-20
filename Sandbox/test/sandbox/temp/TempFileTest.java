@@ -49,8 +49,7 @@ public class TempFileTest
     @Test
     public void testGetTempFolderName()
     {
-        DateFormat df = new SimpleDateFormat("yyyy_MM_dd_hh_mm");
-        Date d = new Date();
+
         Handler h = null;
         String tempPath = System.getProperty("java.io.tmpdir") + "java_log"  + File.separator;
         System.out.print(tempPath);

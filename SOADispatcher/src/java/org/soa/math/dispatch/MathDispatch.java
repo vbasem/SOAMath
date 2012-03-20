@@ -4,6 +4,8 @@
  */
 package org.soa.math.dispatch;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import org.soa.math.executer.task.TaskFactory;
 import java.util.Observable;
 import java.util.Observer;
@@ -28,17 +30,20 @@ public class MathDispatch implements Observer
 {
     public MathDispatch()
     {
-        QueueFactory.getStaticQueueMonitor().startMonitor();
-        ResourcesFactory.getStaticArithmaticResourceMonitor().startMonitor();
+
     }
     
     @WebMethod(operationName="add")
-    public <T> T add( T x, T y) throws InterruptedException, ExecutionException
+    public String add(String x, String y) throws InterruptedException, ExecutionException, ParseException
     {
-        Number  s = (Number)(x);
-        Number  z = (Number)(y);
-        Task t = TaskFactory.createAdditionTask(s, z);
-        return (T) getFutureResultFromTask(t).get();
+        Number a = NumberFormat.getInstance().parse(x);
+        Number b = NumberFormat.getInstance().parse(y);
+
+        Logger.getLogger("asd").severe("" + x.toString() + " " + y.toString());
+
+        Task t = TaskFactory.createAdditionTask(a, b);
+        
+        return getFutureResultFromTask(t).get().toString();
     }
     
     @WebMethod(operationName="multiply")
