@@ -11,15 +11,11 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import org.soa.math.executer.task.Task;
 import org.soa.math.queue.QueueFactory;
-import org.soa.math.resource.ResourcesFactory;
-import sun.text.normalizer.UCharacter;
 
 /**
  *

@@ -121,6 +121,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
     private boolean isFreeResoiurceCollectionAvailable(String resourceType)
     {
+
         if (freeResources.containsKey(resourceType))
         {
             return true;
@@ -223,6 +224,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
             // back into free resources if no pending
             putFreeResourceInCollection(resource);
         }
+        
     }
 
     private void getAvailableResourcesFromRegistry()
@@ -233,6 +235,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         for (RegisteredService service : registeredServices)
         {
             // if we have it, skip it
+            
             if (registeredResourcesAvailable.containsKey(service.getId()))
             {
                 continue;
@@ -252,7 +255,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         getFreeResourceCollectionForType(resourceTypeName);
         freeResources.get(resourceTypeName).put(res.getResourceDescriptor(), res);
     }
-
+    
     /**
      *
      */
