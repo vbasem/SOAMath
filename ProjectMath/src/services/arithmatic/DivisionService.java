@@ -14,12 +14,12 @@ public class DivisionService implements ArithmaticService
     {
 		Arithmetic ar = new Arithmetic<Number>((Number) x);
 
-		return (T) ar.mul((Number) y).value();
+		return (T) ar.div((Number) y).value();
     }
 
     public <T> T calculate(T x, T y)
     {
-    	ServiceLogger.getLogger().info("multiplying " +  x + " with " + y);
+    	ServiceLogger.getLogger().info("dividing " +  x + " by " + y);
 
     	return multiply(x, y);
     }

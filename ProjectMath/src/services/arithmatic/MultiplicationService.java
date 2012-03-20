@@ -14,7 +14,7 @@ public class MultiplicationService implements ArithmaticService
     {
 		Arithmetic ar = new Arithmetic<Number>((Number) x);
 
-		return (T) ar.sub((Number) y).value();
+		return (T) ar.mul((Number) y).value();
     }
 
     public <T> T calculate(T x, T y)

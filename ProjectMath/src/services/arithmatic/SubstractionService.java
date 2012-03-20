@@ -14,12 +14,12 @@ public class SubstractionService implements ArithmaticService
     {
 		Arithmetic ar = new Arithmetic<Number>((Number) x);
 
-		return (T) ar.div((Number) y).value();
+		return (T) ar.sub((Number) y).value();
     }
 
     public <T> T calculate(T x, T y)
     {
-    	ServiceLogger.getLogger().info("multiplying " +  x + " with " + y);
+    	ServiceLogger.getLogger().info("Substracting " +  x + " from " + y);
 
     	return divide(x, y);
     }
