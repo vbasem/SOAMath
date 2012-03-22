@@ -24,8 +24,8 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     protected Map<String, ResourceCollection> usedResources = new ConcurrentHashMap();
     protected Map<String, PendingResourceRequests> pendingResourceRequests = new ConcurrentHashMap();
     protected Map registeredResourcesAvailable = new ConcurrentHashMap();
+    protected Map waitingForServerStart = new ConcurrentHashMap();
     protected Thread monitorThread = new Thread(this);
-    ;
     private boolean stopMonitoring = false;
 
     @Override
@@ -240,7 +240,9 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
             {
                 continue;
             }
-
+            
+            // now we can start more server of this type if we had waiting for start pending
+            waitingForServerStart.remove(service.getType());
             Resource res = ResourcesFactory.getArithmaticWebServiceResource(service);
             registeredResourcesAvailable.put(res.getResourceDescriptor(), res);
             res.addObserver(this);
@@ -343,8 +345,10 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
                 SettingsRepository.getConcurrencySettings().
                 getNumericProperty("number_of_available_machines");
 
-        if (registeredResourcesAvailable.size() < availableServers)
+        if (registeredResourcesAvailable.size() < availableServers && !waitingForServerStart.containsKey(type))
         {
+            // TODO: this limits start of same type of server to 1
+            waitingForServerStart.put(type, true);
             ClientFactory.getVmControlClient().startService(type);
         }
 

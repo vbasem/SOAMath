@@ -11,7 +11,7 @@ import javax.ejb.Singleton;
 import org.soa.virtualmachine.config.SettingsRepository;
 import org.virtualbox_4_1.*;
 
-public class VirtualMachineClient extends Thread
+public class VirtualMachineClient
 {
 
     private static VirtualMachineClient singleton = null;
@@ -21,7 +21,7 @@ public class VirtualMachineClient extends Thread
 
     public static VirtualMachineClient getInstance()
     {
-        if (VirtualMachineClient.singleton == null)
+  //      if (VirtualMachineClient.singleton == null)
         {
             Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.INFO, "client was null, instantiating", singleton);
             singleton = new VirtualMachineClient();
@@ -40,10 +40,11 @@ public class VirtualMachineClient extends Thread
         if (nextAvailableMachineName != null)
         {
             startVm(nextAvailableMachineName);
-            waitForMachineToBootUp();
-
-            startProcess(nextAvailableMachineName, getArithmaticServerProcessCommand(nextAvailableMachineName, mode));
-
+//            sleep(SettingsRepository
+//                    .getServicesUrlSettings()
+//                    .getNumericProperty("sleep_before_starting_commands_on_remote"));
+            startProcess(nextAvailableMachineName,
+                    getArithmaticServerProcessCommand(nextAvailableMachineName, mode));
         }
     }
 
@@ -77,28 +78,26 @@ public class VirtualMachineClient extends Thread
                 }
             }
         }
-//        Set<String> keys = runningMachines.keySet();
-//        Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, runningMachines.entrySet().toString(), runningMachines.entrySet());
-//        for (String key : keys)
-//        {
-//            if (runningMachines.get(key) == null)
-//            {
-//                return key;
-//            }
-//        }
 
         return null;
     }
 
     public String startVm(String machineName)
     {
+        // wait max 10 sex for machine status to change to powered down before we start it
         try
         {
-            manager.startVm(machineName, null, 7000);
-        } catch (VBoxException e)
+            waitForStatusChange(manager.getVBox().findMachine(machineName),
+                    MachineState.PoweredOff,
+                    1000,
+                    10000);
+        } catch (VirtualMachineStateError ex)
         {
-            return "failed to start " + machineName + "<br />The reason was: " + e.getMessage() + "<br />";
+            Logger.getLogger("vmcontrol").severe(ex.getMessage());
         }
+        
+        manager.startVm(machineName, null, 7000);
+
         return "Attempting to start : " + machineName + "<br />";
     }
 
@@ -110,9 +109,9 @@ public class VirtualMachineClient extends Thread
         try
         {
             ISession session = getMachineSession(machineName);
-            //IMachine machiene = session.getMachine();
             session.getConsole().powerDown();
-            session.unlockMachine();
+            session.getConsole().releaseRemote();
+            session.unlockMachine();            
 
         } catch (Exception ex)
         {
@@ -129,6 +128,7 @@ public class VirtualMachineClient extends Thread
         {
             try
             {
+                box.releaseRemote();
                 manager.cleanup();
                 manager.disconnect();
             } catch (Exception ex)
@@ -137,6 +137,7 @@ public class VirtualMachineClient extends Thread
             } finally
             {
                 manager = null;
+                box = null;
             }
         }
 
@@ -158,12 +159,20 @@ public class VirtualMachineClient extends Thread
         {
             IMachine machine = box.findMachine(machineName);
             session = manager.openMachineSession(machine);
-
             Holder<Long> pid = new Holder<Long>();
-
             List<String> env = new ArrayList<String>();
+            int i = 0;
+            while (!session.getConsole().getGuest().getAdditionsStatus(AdditionsRunLevelType.Userland) && i < 60)
+            {
+                i++;
+                sleep(1000);
+            }
 
-            IProgress prog = session.getConsole().getGuest().executeProcess("/usr/bin/java", new Long(1), args, env, "basemv", "basemv", new Long(15000), pid);
+            if (session.getConsole().getGuest().getAdditionsStatus(AdditionsRunLevelType.Userland))
+            {
+                IProgress prog = session.getConsole().getGuest().executeProcess("/usr/bin/java", new Long(1), args, env, "basemv", "basemv", new Long(7000), pid);
+            }
+            
         } catch (Exception ex)
         {
             Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -185,26 +194,38 @@ public class VirtualMachineClient extends Thread
         box = manager.getVBox();
     }
 
-    @Override
-    public void run()
+    private void waitForStatusChange(IMachine machine,
+            MachineState wantedState,
+            int sleepMS,
+            int maxSleepTime) throws VirtualMachineStateError
     {
-        while (keep_alive)
+        int waitedSoFar = 0;
+
+        while (waitedSoFar < maxSleepTime)
         {
-            try
+            if (machine.getState() != wantedState)
             {
-                this.wait();
-            } catch (InterruptedException ex)
+                sleep(sleepMS);
+                waitedSoFar += sleepMS;
+            } else
             {
-                Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);
+                break;
             }
         }
+
+        if (machine.getState() != wantedState)
+        {
+            throw new VirtualMachineStateError("the machine " + machine.getName() + " did not reach the state " + wantedState.toString() + " after " + maxSleepTime + " ms;");
+        }
+
     }
 
-    private void waitForMachineToBootUp()
+    private void sleep(int sleepMS)
     {
         try
         {
-            Thread.sleep(60000);
+            Thread.sleep(sleepMS);
+
         } catch (InterruptedException ex)
         {
             Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);

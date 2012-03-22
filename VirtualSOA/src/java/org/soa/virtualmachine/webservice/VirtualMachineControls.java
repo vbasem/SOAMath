@@ -14,13 +14,31 @@ import org.soa.virtualmachine.VirtualMachineClient;
 @WebService()
 public class VirtualMachineControls
 {
-    public void startArithmaticServer(String arithmaticMode)
+    public void startArithmaticServer(final String arithmaticMode)
     {
-        VirtualMachineClient.getInstance().startArithmaticServer("arithmatic", arithmaticMode);
+        Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+                VirtualMachineClient.getInstance().startArithmaticServer("arithmatic", arithmaticMode);
+            }
+        });
+        
+        t.start();
     }
     
-    public void stopServer(String serverIdentifier)
+    public void stopServer(final String serverIdentifier)
     {
-        VirtualMachineClient.getInstance().stopVm(serverIdentifier);
+                Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+               VirtualMachineClient.getInstance().stopVm(serverIdentifier);
+            }
+        });
+        
+        t.start();
     }
 }
