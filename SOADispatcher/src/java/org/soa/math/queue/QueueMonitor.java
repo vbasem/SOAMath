@@ -49,6 +49,7 @@ public class QueueMonitor implements Monitor, Runnable
         {
             Logger.getLogger(QueueMonitor.class.getName()).log(Level.WARNING, "starting queue monitor");
             monitoringThread.start();
+            ExecutorFactory.getStaticExecutionControl().addObserver(this);
         }
 
     }
@@ -63,6 +64,7 @@ public class QueueMonitor implements Monitor, Runnable
     public void update(Observable o, Object arg)
     {
         freeSlot();
+        // TODO: use a wake up system
         fetchNewTaskRoundRobin();
     }
     

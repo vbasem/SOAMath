@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.soa.math.global.AbstractFactory;
 import org.soa.math.request.RequestType;
+import org.soa.math.resource.ServerControl;
 import org.soa.math.resource.clients.arithmatic.AdditionWebServiceClient;
 import org.soa.math.resource.clients.arithmatic.DivisionWebServiceClient;
 import org.soa.math.resource.clients.arithmatic.MultiplicationWebServiceClient;
@@ -21,9 +22,9 @@ import org.soa.math.resource.clients.arithmatic.SubstractionWebServiceClient;
  */
 public class ClientFactory extends AbstractFactory
 {
-
-    private static RegistryServiceClient registryService = null;
-    private static VirtualMachineControlClient vmClient = null;
+    private static final ServerControl serverControl = new ServerControl();
+    private static final RegistryServiceClient registryService = new RegistryServiceClient();
+    private static final VirtualMachineControlClient vmClient = new VirtualMachineControlClient();
     private static final HashMap<String, Class> clientInstanceCreatorMapping;
     
     static
@@ -82,11 +83,6 @@ public class ClientFactory extends AbstractFactory
             return null;
         }
 
-        if (registryService == null)
-        {
-            registryService = new RegistryServiceClient();
-        }
-
         return registryService;
     }
 
@@ -97,11 +93,16 @@ public class ClientFactory extends AbstractFactory
             return null;
         }
 
-        if (vmClient == null)
+        return vmClient;
+    }
+    
+    public static ServerControl getServerControl()
+    {
+        if (isTestMode())
         {
-            vmClient = new VirtualMachineControlClient();
+            return null;
         }
 
-        return vmClient;
+        return serverControl;        
     }
 }

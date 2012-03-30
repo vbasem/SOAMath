@@ -15,28 +15,17 @@ import org.soa.math.queue.QueueFactory;
 public class ExecutorFactory extends AbstractFactory
 {
 
-    private static ExecutionControl control = null;
+    private static final ExecutionControl control = new ExecutionControl();
 
     public static ExecutionControl getStaticExecutionControl()
     {
         if (!isTestMode())
         {
-            return instantiateExecutionControlSingleton();
+            return control;
         } else
         {
             return null;
         }
-    }
-
-    protected static ExecutionControl instantiateExecutionControlSingleton()
-    {
-        if (control == null)
-        {
-            control = new ExecutionControl();
-            control.addObserver(QueueFactory.getStaticQueueMonitor());
-        }
-
-        return control;
     }
     
     public static TaskExecutor getThreadedTaskExecutor(Task t)

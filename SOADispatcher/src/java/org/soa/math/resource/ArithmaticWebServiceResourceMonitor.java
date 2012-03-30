@@ -24,7 +24,6 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     protected Map<String, ResourceCollection> usedResources = new ConcurrentHashMap();
     protected Map<String, PendingResourceRequests> pendingResourceRequests = new ConcurrentHashMap();
     protected Map registeredResourcesAvailable = new ConcurrentHashMap();
-    protected Map waitingForServerStart = new ConcurrentHashMap();
     protected Thread monitorThread = new Thread(this);
     private boolean stopMonitoring = false;
 
@@ -34,9 +33,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         removeResourceFromAllQueues(resource);
 
         String resourceId = resource.getResourceDescriptor();
-
-        ClientFactory.getRegistryServiceClient().unregisterService(resourceId);
-        ClientFactory.getVmControlClient().stopService(resourceId);
+        ClientFactory.getServerControl().stopAndUnregisterServer(resourceId);
 
     }
 
@@ -154,10 +151,11 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         // the go to sleep until it comes online
         startNewResourceServerIfPossible(resourceType);
 
-        getPendingRequestForType(resourceType).
-                addRequestThreadToPendingAndIncrement(Thread.currentThread());
-
         Thread currentThread = Thread.currentThread();
+        
+        getPendingRequestForType(resourceType).
+                addRequestThreadToPendingAndIncrement(currentThread);
+        
         // we dont have ready resource, wait till notified
         synchronized (currentThread)
         {
@@ -230,7 +228,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     private void getAvailableResourcesFromRegistry()
     {
         List<RegisteredService> registeredServices =
-                ClientFactory.getRegistryServiceClient().getAllRegisteredServices();
+                ClientFactory.getServerControl().getListOfAllAvailableServers();
 
         for (RegisteredService service : registeredServices)
         {
@@ -241,8 +239,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
                 continue;
             }
             
-            // now we can start more server of this type if we had waiting for start pending
-            waitingForServerStart.remove(service.getType());
+
             Resource res = ResourcesFactory.getArithmaticWebServiceResource(service);
             registeredResourcesAvailable.put(res.getResourceDescriptor(), res);
             res.addObserver(this);
@@ -277,7 +274,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
                 if (freeResources.get(typeOfLargestFreeResourceCollection).size() > pendingResourceRequests.get(typeOfLargestPendingResourceCollection).getRequestCounter())
                 {
                     freeResource(freeResources.get(typeOfLargestFreeResourceCollection).pop());
-                    ClientFactory.getVmControlClient().startService(typeOfLargestPendingResourceCollection);
+                    ClientFactory.getServerControl().startServer(typeOfLargestPendingResourceCollection);
 
                 }
             }
@@ -286,8 +283,6 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
     private String getTypeOfLargestFreeResourceCollection()
     {
-        Map m = new HashMap();
-
         int largestFreeCollectionSize = 0;
         String largestFreeCollectionType = null;
         Iterator<Entry<String, ResourceCollection>> freeCollectionsIterator =
@@ -345,11 +340,9 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
                 SettingsRepository.getConcurrencySettings().
                 getNumericProperty("number_of_available_machines");
 
-        if (registeredResourcesAvailable.size() < availableServers && !waitingForServerStart.containsKey(type))
+        if (registeredResourcesAvailable.size() < availableServers)
         {
-            // TODO: this limits start of same type of server to 1
-            waitingForServerStart.put(type, true);
-            ClientFactory.getVmControlClient().startService(type);
+            ClientFactory.getServerControl().startServer(type);
         }
 
         // how do i wait till server is up?

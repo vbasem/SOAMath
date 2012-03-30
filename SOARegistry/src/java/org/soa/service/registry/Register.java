@@ -5,8 +5,9 @@
 package org.soa.service.registry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,10 +17,12 @@ import java.util.logging.Logger;
  */
 public class Register
 {
-    private static HashMap<String, RegisteredService> serviceRegister = new HashMap<String, RegisteredService>();
+    private static Map<String, RegisteredService> serviceRegister = new ConcurrentHashMap<String, RegisteredService>();
     
     public static void registerService(String identifier, RegisteredService service )
     {
+        RegistryHeartBeat.startMonitoringHeartBeats();
+        
         serviceRegister.put(identifier, service);
         Logger.getLogger("registery").log(Level.INFO, "registring {0} at {1} requested at {2}", new Object[]{identifier, service.getUrl(), System.currentTimeMillis()});
     }
@@ -39,7 +42,10 @@ public class Register
     {
         //Logger.getLogger("registery").log(Level.INFO, "getting all services {0}", serviceRegister.size());
         RegisteredService[] services = {};
-        services = serviceRegister.values().toArray(services);
+        if (!serviceRegister.isEmpty())
+        {
+            services = serviceRegister.values().toArray(services);
+        }
         
         return services;
     }

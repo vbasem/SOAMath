@@ -14,13 +14,16 @@ public class RegisteredService
     public String url;
     public String type;
     
+    private long registeredAt;
+    
     public RegisteredService()
     {
-        
     }
     
     public RegisteredService(String id, String url, String type)
     {
+        registeredAt = System.currentTimeMillis();
+        
         this.id = id;
         this.url = url;
         this.type = type;
@@ -39,5 +42,10 @@ public class RegisteredService
     public String getType() 
     {
         return type;
+    }
+    
+    protected Long getRegisteredAt()
+    {
+        return registeredAt;
     }
 }

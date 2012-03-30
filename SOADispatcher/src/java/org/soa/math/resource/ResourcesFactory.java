@@ -16,26 +16,16 @@ import org.soa.service.registry.RegisteredService;
  */
 public class ResourcesFactory extends AbstractFactory
 {
-    protected static ResourceMonitor resourceMonitorStaticInstance = null;
+    protected static final ResourceMonitor resourceMonitorStaticInstance = new ArithmaticWebServiceResourceMonitor();
     
     public static ResourceMonitor getStaticArithmaticResourceMonitor()
     {
         if (!isTestMode())
         {
-            return instantiateResourceMonitorSingleton();
+            return resourceMonitorStaticInstance;
         }
         
         return null;
-    }
-    
-    protected static ResourceMonitor instantiateResourceMonitorSingleton()
-    {
-        if (resourceMonitorStaticInstance == null)
-        {
-            resourceMonitorStaticInstance = new ArithmaticWebServiceResourceMonitor();
-        }
-        
-        return resourceMonitorStaticInstance;
     }
     
     
@@ -45,6 +35,7 @@ public class ResourcesFactory extends AbstractFactory
         {
             return null;
         }
+        
         ResourceType type = new ResourceType(source.getType());
         Resource resource = new ArithmaticResource(
                 ClientFactory.getArithmaticWebServiceClient(source.getUrl(), source.getType()), 

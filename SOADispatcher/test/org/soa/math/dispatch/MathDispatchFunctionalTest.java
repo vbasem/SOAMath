@@ -50,8 +50,8 @@ public class MathDispatchFunctionalTest
         final String a = "2";
         final String b = "2";
         final String result = "4";
-
-        final MathDispatch dispatcher = new MathDispatch();
+        final int numberOfIterations = 100;
+    //    final MathDispatch dispatcher = new MathDispatch();
 
         waitTillApplicationBootstraps();
 
@@ -61,12 +61,13 @@ public class MathDispatchFunctionalTest
             @Override
             public void run()
             {
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < numberOfIterations; i++)
                 {
                     try
                     {
                         try
                         {
+                            MathDispatch dispatcher = new MathDispatch();
                             assertEquals(result, dispatcher.add(a, b));
                         } catch (ParseException ex)
                         {
@@ -88,12 +89,13 @@ public class MathDispatchFunctionalTest
             @Override
             public void run()
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < numberOfIterations; i++)
                 {
                     try
                     {
                         try
                         {
+                            MathDispatch dispatcher = new MathDispatch();
                             assertEquals(result, dispatcher.add(a, b));
                         } catch (ParseException ex)
                         {
@@ -117,12 +119,13 @@ public class MathDispatchFunctionalTest
             @Override
             public void run()
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < numberOfIterations; i++)
                 {
                     try
                     {
                         try
                         {
+                            MathDispatch dispatcher = new MathDispatch();
                             assertEquals(result, dispatcher.add(a, b));
                         } catch (ParseException ex)
                         {
