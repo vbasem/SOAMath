@@ -51,7 +51,7 @@ public class MathDispatchFunctionalTest
         final String b = "2";
         final String result = "4";
         final int numberOfIterations = 100;
-    //    final MathDispatch dispatcher = new MathDispatch();
+        //    final MathDispatch dispatcher = new MathDispatch();
 
         waitTillApplicationBootstraps();
 
@@ -156,6 +156,28 @@ public class MathDispatchFunctionalTest
             Logger.getLogger(MathDispatchFunctionalTest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    @Test
+    public void testSingleOperation() throws InterruptedException, ExecutionException, ParseException
+    {
+        final String a = "2";
+        final String b = "2";
+        final String result = "0";
+        final int numberOfIterations = 100;
+        //    final MathDispatch dispatcher = new MathDispatch();
+
+        waitTillApplicationBootstraps();
+        MathDispatch dispatcher = new MathDispatch();
+        assertEquals(result, dispatcher.multiply(a, b));
+
+    }
+    
+    @Test
+    public void testDispatcherStartup() throws InterruptedException
+    {
+        waitTillApplicationBootstraps();
+        Thread.sleep(10000000);
     }
 
     private void waitTillApplicationBootstraps()

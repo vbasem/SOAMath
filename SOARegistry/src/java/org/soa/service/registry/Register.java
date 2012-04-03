@@ -24,7 +24,7 @@ public class Register
         RegistryHeartBeat.startMonitoringHeartBeats();
         
         serviceRegister.put(identifier, service);
-        Logger.getLogger("registery").log(Level.INFO, "registring {0} at {1} requested at {2}", new Object[]{identifier, service.getUrl(), System.currentTimeMillis()});
+     //   Logger.getLogger("registery").log(Level.INFO, "registring {0} at {1} requested at {2}", new Object[]{identifier, service.getUrl(), System.currentTimeMillis()});
     }
     
     public static RegisteredService getServiceById(String identifier)

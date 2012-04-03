@@ -24,21 +24,23 @@ public class ServerControl
     protected Map serversWaitingToBeStarted = new ConcurrentHashMap();
     protected Map lastReceivedListOfServicesFromRegistry = new ConcurrentHashMap();
     
-    public void startServer(String serverType)
+    public synchronized boolean isServerStarting(String serverType)
     {
-        if (!serversWaitingToBeStarted.containsKey(serverType))
+        return serversWaitingToBeStarted.containsKey(serverType);
+    }
+    
+    public synchronized void startServer(String serverType)
+    {
+        if (!isServerStarting(serverType))
         {
+            System.out.println(" request to start server " + serverType);
             // TODO: this limits start of same type of server to 1
             serversWaitingToBeStarted.put(serverType, true);
             ClientFactory.getVmControlClient().startService(serverType);
         }
     }
 
-    public synchronized void stopServer(String serverId)
-    {
-    }
-
-    public List<RegisteredService> getListOfAllAvailableServers()
+    public synchronized List<RegisteredService> getListOfAllAvailableServers()
     {
         // now we can start more server of this type if we had waiting for start pending
         List<RegisteredService> servicesFromRegistry =
@@ -58,8 +60,9 @@ public class ServerControl
         return servicesFromRegistry;
     }
 
-    public void stopAndUnregisterServer(String serverId)
+    public synchronized void stopAndUnregisterServer(String serverId)
     {
+        System.out.println(" request to stop server " + serverId);
         if (lastReceivedListOfServicesFromRegistry.containsKey(serverId))
         {
             lastReceivedListOfServicesFromRegistry.remove(serverId);

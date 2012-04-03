@@ -31,10 +31,11 @@ public class VirtualMachineMarshaller extends HttpServlet
         String result = "";
         try
         {
-            m = VirtualMachineClient.getInstance().getClass().getDeclaredMethod(request, String.class);
+            VirtualMachineClient client = new VirtualMachineClient();
+            m = client.getClass().getDeclaredMethod(request, String.class);
             try
             {
-                result = (String) m.invoke(VirtualMachineClient.getInstance(), parameter);
+                result = (String) m.invoke(client, parameter);
             } catch (IllegalAccessException ex)
             {
                 Logger.getLogger(VirtualMachineMarshaller.class.getName()).log(Level.SEVERE, null, ex);

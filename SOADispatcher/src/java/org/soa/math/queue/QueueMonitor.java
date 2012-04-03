@@ -34,7 +34,7 @@ public class QueueMonitor implements Monitor, Runnable
             fetchNewTaskRoundRobin();
             try
             {
-                monitoringThread.sleep(100);
+                monitoringThread.sleep(10);
             } catch (InterruptedException ex)
             {
                 Logger.getLogger(QueueMonitor.class.getName()).log(Level.SEVERE, null, ex);
@@ -65,7 +65,7 @@ public class QueueMonitor implements Monitor, Runnable
     {
         freeSlot();
         // TODO: use a wake up system
-        fetchNewTaskRoundRobin();
+        //fetchNewTaskRoundRobin();
     }
     
     protected void fetchNewTaskRoundRobin()

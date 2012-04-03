@@ -47,7 +47,6 @@ public class RegistryHeartBeat implements Runnable
         {
             for (RegisteredService service : Register.listAllRegisteredServices())
             {
-                Logger.getLogger("heartbeat").severe("current time = " + currentTime + " ; and service time: " + service.getRegisteredAt());
                 if ((currentTime - service.getRegisteredAt()) > TIME_TO_DEATH_OF_SERVICE)
                 {
                     Register.unregisterService(service.getId());

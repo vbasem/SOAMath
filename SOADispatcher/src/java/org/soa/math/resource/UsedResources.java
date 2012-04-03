@@ -4,12 +4,14 @@
  */
 package org.soa.math.resource;
 
-import java.util.HashMap;
-
 /**
  *
  * @author Basem
  */
 public class UsedResources extends ResourceCollection
 {
+        public UsedResources(String identifier)
+    {
+        super(identifier);
+    }
 }

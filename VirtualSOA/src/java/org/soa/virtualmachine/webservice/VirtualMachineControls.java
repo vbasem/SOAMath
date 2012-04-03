@@ -4,6 +4,7 @@
  */
 package org.soa.virtualmachine.webservice;
 
+import java.util.logging.Logger;
 import javax.jws.WebService;
 import org.soa.virtualmachine.VirtualMachineClient;
 
@@ -14,14 +15,18 @@ import org.soa.virtualmachine.VirtualMachineClient;
 @WebService()
 public class VirtualMachineControls
 {
+
     public void startArithmaticServer(final String arithmaticMode)
     {
-        Thread t = new Thread(new Runnable() {
-
+        Logger.getLogger("vmControl").info("starting machine for mode: " + arithmaticMode);
+        Thread t = new Thread(new Runnable()
+        {
+            
             @Override
             public void run()
             {
-                VirtualMachineClient.getInstance().startArithmaticServer("arithmatic", arithmaticMode);
+                VirtualMachineClient client = new VirtualMachineClient();
+                client.startArithmaticServer("arithmatic", arithmaticMode);
             }
         });
         
@@ -30,12 +35,15 @@ public class VirtualMachineControls
     
     public void stopServer(final String serverIdentifier)
     {
-                Thread t = new Thread(new Runnable() {
-
+        Logger.getLogger("vmControl").info("stoping machine: " + serverIdentifier);
+        Thread t = new Thread(new Runnable()
+        {
+            
             @Override
             public void run()
             {
-               VirtualMachineClient.getInstance().stopVm(serverIdentifier);
+                VirtualMachineClient client = new VirtualMachineClient();
+                client.stopVm(serverIdentifier);
             }
         });
         

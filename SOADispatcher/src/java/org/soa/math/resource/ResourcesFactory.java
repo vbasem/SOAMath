@@ -29,7 +29,7 @@ public class ResourcesFactory extends AbstractFactory
     }
     
     
-    public static Resource getArithmaticWebServiceResource(RegisteredService source)
+    public static Resource getServiceResource(RegisteredService source)
     {
         if (isTestMode())
         {

@@ -12,5 +12,8 @@ import java.util.HashMap;
  */
 public class FreeResources extends ResourceCollection
 {
-    
+    public FreeResources(String identifier)
+    {
+        super(identifier);
+    }
 }

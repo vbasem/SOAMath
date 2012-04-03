@@ -4,6 +4,7 @@
  */
 package org.soa.virtualmachine;
 
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,22 +15,11 @@ import org.virtualbox_4_1.*;
 public class VirtualMachineClient
 {
 
-    private static VirtualMachineClient singleton = null;
     private boolean keep_alive = false;
     private VirtualBoxManager manager;
     private IVirtualBox box;
-
-    public static VirtualMachineClient getInstance()
-    {
-  //      if (VirtualMachineClient.singleton == null)
-        {
-            Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.INFO, "client was null, instantiating", singleton);
-            singleton = new VirtualMachineClient();
-        }
-
-        return singleton;
-    }
     private ISession session;
+
 
     public void startArithmaticServer(String operationPrefix, String mode)
     {
@@ -68,34 +58,44 @@ public class VirtualMachineClient
 
     protected String nameOfNextFreeMachine(String operationPrefix)
     {
-        for (IMachine mach : box.getMachines())
+        String machineName = null;
+        
+        boolean waitForMAchinesToPowerOff = true;
+        
+        for (int i = 0; i < 10; i++)
         {
-            if (mach.getName().indexOf(operationPrefix) != -1)
+            for (IMachine mach : box.getMachines())
             {
-                if (mach.getState() == MachineState.PoweredOff)
+                if (mach.getName().indexOf(operationPrefix) != -1)
                 {
-                    return mach.getName();
+                    if (mach.getState() == MachineState.PoweredOff)
+                    {
+                        machineName = mach.getName();
+                        break;
+                    }
                 }
             }
+            
+            sleep(1000);
         }
 
-        return null;
+        return machineName;
     }
 
     public String startVm(String machineName)
     {
         // wait max 10 sex for machine status to change to powered down before we start it
-        try
-        {
-            waitForStatusChange(manager.getVBox().findMachine(machineName),
-                    MachineState.PoweredOff,
-                    1000,
-                    10000);
-        } catch (VirtualMachineStateError ex)
-        {
-            Logger.getLogger("vmcontrol").severe(ex.getMessage());
-        }
-        
+//        try
+//        {
+//            waitForStatusChange(manager.getVBox().findMachine(machineName),
+//                    MachineState.PoweredOff,
+//                    1000,
+//                    10000);
+//        } catch (VirtualMachineStateError ex)
+//        {
+//            Logger.getLogger("vmcontrol").severe(ex.getMessage());
+//        }
+
         manager.startVm(machineName, null, 7000);
 
         return "Attempting to start : " + machineName + "<br />";
@@ -111,7 +111,7 @@ public class VirtualMachineClient
             ISession session = getMachineSession(machineName);
             session.getConsole().powerDown();
             session.getConsole().releaseRemote();
-            session.unlockMachine();            
+            session.unlockMachine();
 
         } catch (Exception ex)
         {
@@ -124,7 +124,7 @@ public class VirtualMachineClient
 
     public String resetVm(String flag)
     {
-        if (manager != null)
+        if (manager != null && box != null)
         {
             try
             {
@@ -138,6 +138,7 @@ public class VirtualMachineClient
             {
                 manager = null;
                 box = null;
+                session = null;
             }
         }
 
@@ -172,7 +173,7 @@ public class VirtualMachineClient
             {
                 IProgress prog = session.getConsole().getGuest().executeProcess("/usr/bin/java", new Long(1), args, env, "basemv", "basemv", new Long(7000), pid);
             }
-            
+
         } catch (Exception ex)
         {
             Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -201,6 +202,8 @@ public class VirtualMachineClient
     {
         int waitedSoFar = 0;
 
+        waitForUnlockedSession();
+        
         while (waitedSoFar < maxSleepTime)
         {
             if (machine.getState() != wantedState)
@@ -217,6 +220,20 @@ public class VirtualMachineClient
         {
             throw new VirtualMachineStateError("the machine " + machine.getName() + " did not reach the state " + wantedState.toString() + " after " + maxSleepTime + " ms;");
         }
+
+    }
+
+    private void waitForUnlockedSession()
+    {
+        int waitedSoFar = 0;
+        SessionState state = null;
+
+        do
+        {
+            sleep(1000);
+            state = manager.getSessionObject().getState();
+            waitedSoFar++;
+        } while (state != SessionState.Unlocked && waitedSoFar < 10);
 
     }
 
