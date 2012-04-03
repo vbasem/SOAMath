@@ -4,9 +4,8 @@
  */
 package org.soa.math.queue;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 import java.util.concurrent.Future;
 import org.soa.math.executer.task.Task;
 import org.soa.math.request.RequestType;
@@ -18,5 +17,5 @@ import org.soa.math.request.RequestType;
 public interface TaskQueue extends Map, Iterable
 {
     public Future putToQueueAndGetFeatureObject(Task t);
-    public BlockingQueue getQueueForRequestType(RequestType type);
+    public Queue  getQueueForRequestType(RequestType type);
 }

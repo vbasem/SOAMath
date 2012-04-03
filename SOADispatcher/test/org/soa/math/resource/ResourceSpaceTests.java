@@ -12,11 +12,11 @@ import org.soa.math.properties.SettingsRepository;
  *
  * @author Basem
  */
-public class PendingResourceRequestsTest
+public class ResourceSpaceTests
 {
     private final double LOAD_DELTA = 0.01;
 
-    public PendingResourceRequestsTest()
+    public ResourceSpaceTests()
     {
     }
 
@@ -43,7 +43,7 @@ public class PendingResourceRequestsTest
     @Test
     public void testGetLoad_noFreeResourceOneUsedResourcesWithPendingRequests_returnsMaxLoad()
     {
-        ActiveResourceSpace pending = new ActiveResourceSpace("test");
+        ResourceSpace pending = new ResourceSpace("test");
         pending.addRequestThreadToPendingAndIncrement(Thread.currentThread());
 
         assertEquals(pending.MAX_LOAD, pending.getLoad(), LOAD_DELTA);
@@ -52,7 +52,7 @@ public class PendingResourceRequestsTest
     @Test
     public void testGetLoad_noFreeResourceOneUsedResourceWithPendingRequests_returnsMaxLoad()
     {
-        ActiveResourceSpace pending = new ActiveResourceSpace("test");
+        ResourceSpace pending = new ResourceSpace("test");
         
         pending.addRequestThreadToPendingAndIncrement(Thread.currentThread());
         pending.addRequestThreadToPendingAndIncrement(Thread.currentThread());
@@ -67,7 +67,7 @@ public class PendingResourceRequestsTest
     @Test
     public void testGetLoad_allEmpty_returnsMaxLoad()
     {
-        ActiveResourceSpace pending = new ActiveResourceSpace("test");
+        ResourceSpace pending = new ResourceSpace("test");
 
         assertEquals(pending.MAX_LOAD, pending.getLoad(), LOAD_DELTA);
     }
@@ -79,7 +79,7 @@ public class PendingResourceRequestsTest
         double pendingActivity = 0.3;
         double expectedValue = pendingActivity / numberOfFreeResources;
 
-        ActiveResourceSpace pending = new ActiveResourceSpace("test");
+        ResourceSpace pending = new ResourceSpace("test");
         pending.setActivity(pendingActivity);
         pending.addFreeResource(new Resource(null, null, "1")
         {
@@ -102,7 +102,7 @@ public class PendingResourceRequestsTest
         
         double expectedValue = numberOfPendings * pendingActivity / numberOfFreeResources;
 
-        ActiveResourceSpace pending = new ActiveResourceSpace("test");
+        ResourceSpace pending = new ResourceSpace("test");
         pending.addRequestThreadToPendingAndIncrement(new Thread());
         pending.addRequestThreadToPendingAndIncrement(new Thread());
         pending.addRequestThreadToPendingAndIncrement(new Thread());

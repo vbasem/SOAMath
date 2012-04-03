@@ -17,21 +17,23 @@ import org.soa.math.properties.SettingsRepository;
  *
  * @author Basem
  */
-public class ActiveResourceSpace extends ServiceResourcesAndRequests implements Comparable<ActiveResourceSpace>
+public class ResourceSpace extends ServiceResourcesAndRequests implements Comparable<ResourceSpace>
 {
 
     public static final double MAX_LOAD = SettingsRepository.getConcurrencySettings().
             getNumericProperty("max_number_of_tasks_being_executed");
     public static final double MIN_LOAD = 0.0;
     private static final double MAX_ACTIVITY = 1.0;
-    private static final double MIN_ACTIVITY = 0.0;
+    private static final double MIN_ACTIVITY = 0.1;
     private static final double ACTIVITY_STEP = 0.1;
+    
     private double activity = MIN_ACTIVITY;
     private int requestCounter = 0;
+    
     private Queue<Thread> threadsPending = new ConcurrentLinkedQueue<Thread>();
     private Map resourceBookedForThread = new HashMap();
 
-    public ActiveResourceSpace(String pendingForResourceType)
+    public ResourceSpace(String pendingForResourceType)
     {
         super(pendingForResourceType);
     }
@@ -64,15 +66,12 @@ public class ActiveResourceSpace extends ServiceResourcesAndRequests implements 
         if (!isAnyRequestPending())
         {
             reduceActivity();
-        } else
-        {
-            increaseActivity();
         }
     }
 
     public double getLoad()
     {
-        double activityFactor  = 1;
+        double activityFactor = 1;
         // no free resources : always max load
         if (freeResources.isEmpty())
         {
@@ -85,11 +84,6 @@ public class ActiveResourceSpace extends ServiceResourcesAndRequests implements 
         }
 
         double baseLoad = activityFactor * this.getActivity();
-
-        if (baseLoad == 0)
-        {
-            baseLoad = MAX_ACTIVITY;
-        }
 
         return baseLoad / (double) freeResources.size();
 
@@ -146,13 +140,7 @@ public class ActiveResourceSpace extends ServiceResourcesAndRequests implements 
 
     public boolean isAnyRequestPending()
     {
-        return getRequestCounter() > 0 ? true : false;
-    }
-
-    @Override
-    public int compareTo(ActiveResourceSpace o)
-    {
-        return Double.compare(this.getLoad(), o.getLoad());
+        return threadsPending.isEmpty() ? false : true;
     }
 
     public double getActivity()
@@ -163,5 +151,11 @@ public class ActiveResourceSpace extends ServiceResourcesAndRequests implements 
     public void setActivity(double activityValue)
     {
         this.activity = activityValue;
+    }
+
+    @Override
+    public int compareTo(ResourceSpace o)
+    {
+        return Double.compare(this.getLoad(), o.getLoad());
     }
 }

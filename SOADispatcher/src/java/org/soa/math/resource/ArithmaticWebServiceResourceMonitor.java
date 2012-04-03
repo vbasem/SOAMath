@@ -22,7 +22,7 @@ import org.soa.service.registry.RegisteredService;
 public class ArithmaticWebServiceResourceMonitor extends Observable implements ResourceMonitor, Runnable
 {
 
-    protected Map<String, ActiveResourceSpace> activeResourceSpaces = new ConcurrentHashMap();
+    protected Map<String, ResourceSpace> activeResourceSpaces = new ConcurrentHashMap();
     protected Map registeredResourcesAvailable = new ConcurrentHashMap();
     protected Thread monitorThread = new Thread(this);
     private boolean stopMonitoring = false;
@@ -42,15 +42,6 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
         String resourceType = resource.getType().getTypeName();
         getResourceSpace(resource).removeFreeResource(resource);
         registeredResourcesAvailable.remove(resource.getResourceDescriptor());
-    }
-
-    @Override
-    public Resource acquireResource(String resourceType)
-    {
-        Resource res = getResourceWhenItBecomesAvailable(resourceType);
-        markResourceAsBusy(res);
-
-        return res;
     }
 
     @Override
@@ -97,8 +88,6 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
             getAvailableResourcesFromRegistry();
             balanceResourcesToMeetRequests();
 
-            Thread.yield();
-
             try
             {
                 Thread.sleep(1000);
@@ -111,7 +100,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
     protected void updatePendingRequestsAcitivity()
     {
-        for (ActiveResourceSpace pendingCollection : activeResourceSpaces.values())
+        for (ResourceSpace pendingCollection : activeResourceSpaces.values())
         {
             pendingCollection.updateActivity();
         }
@@ -120,6 +109,15 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
     private boolean isFreeResourceAvailable(String resourceType)
     {
         return !activeResourceSpaces.get(resourceType).getFreeResourceCollection().isEmpty();
+    }
+
+    @Override
+    public Resource acquireResource(String resourceType)
+    {
+        Resource res = getResourceWhenItBecomesAvailable(resourceType);
+        markResourceAsBusy(res);
+
+        return res;
     }
 
     private Resource getResourceWhenItBecomesAvailable(String resourceType)
@@ -138,7 +136,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
         Thread currentThread = Thread.currentThread();
 
-        getPendingRequestForType(resourceType).
+        getResourceSpaceForType(resourceType).
                 addRequestThreadToPendingAndIncrement(currentThread);
 
         // we dont have ready resource, wait till notified
@@ -163,7 +161,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
     private Resource getFreeResourceIfAvailable(String resourceType)
     {
-        return getPendingRequestForType(resourceType).getFreeResourceIfAvailable();
+        return getResourceSpaceForType(resourceType).getFreeResourceIfAvailable();
     }
 
     private void removeResourceFromBusyCollection(Resource res)
@@ -178,21 +176,24 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
     private void checkIfAnyRequestIsPendingForThisResourceType(Resource resource)
     {
-        ActiveResourceSpace pending = getResourceSpace(resource);
+        ResourceSpace pending = getResourceSpace(resource);
 
-        if (pending != null && pending.isAnyRequestPending())
+        synchronized (pending)
         {
-            Thread threadWaitingForResource = pending.getPendingThreadAndDecrement();
-            pending.assignResourceToThread(resource, threadWaitingForResource);
-
-            synchronized (threadWaitingForResource)
+            if (pending != null && pending.isAnyRequestPending())
             {
-                threadWaitingForResource.notify();
+                Thread threadWaitingForResource = pending.getPendingThreadAndDecrement();
+                pending.assignResourceToThread(resource, threadWaitingForResource);
+
+                synchronized (threadWaitingForResource)
+                {
+                    threadWaitingForResource.notify();
+                }
+            } else
+            {
+                // back into free resources if no pending
+                pending.addFreeResource(resource);
             }
-        } else
-        {
-            // back into free resources if no pending
-            getResourceSpace(resource).addFreeResource(resource);
         }
 
     }
@@ -237,8 +238,8 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
             return;
         }
 
-        ActiveResourceSpace largestPendingResourceSpace = getLargestResourceSpace();
-        ActiveResourceSpace lowestLoadSpace = null;
+        ResourceSpace largestPendingResourceSpace = getLargestResourceSpace();
+        ResourceSpace lowestLoadSpace = null;
 
 
         if (largestPendingResourceSpace == null)
@@ -246,52 +247,60 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
             return;
         }
 
-        for (ActiveResourceSpace resourceSpace : activeResourceSpaces.values())
+        for (ResourceSpace currentSpace : activeResourceSpaces.values())
         {
-
-            if (resourceSpace.getResourceType().compareTo(largestPendingResourceSpace.getResourceType()) == 0)
+            if (currentSpace.getResourceType().compareTo(largestPendingResourceSpace.getResourceType()) == 0)
             {
                 continue;
             }
 
+            double currentSpaceLoad = currentSpace.getLoad();
 
-            if (resourceSpace.getLoad() == ActiveResourceSpace.MAX_LOAD)
+            double largestPendingLoad = largestPendingResourceSpace.getLoad();
+            System.out.println("largest pending  " + largestPendingResourceSpace.getResourceType() + "   has " + largestPendingLoad);
+            System.out.println("current  " + currentSpace.getResourceType() + "   has " + currentSpaceLoad);
+            if (currentSpace.getLoad() == ResourceSpace.MAX_LOAD)
             {
                 continue;
             }
 
-            if (resourceSpace.getLoad() > largestPendingResourceSpace.getLoad())
+            if (currentSpaceLoad >= largestPendingLoad)
             {
                 continue;
             }
 
             if (lowestLoadSpace == null)
             {
-                lowestLoadSpace = resourceSpace;
+                lowestLoadSpace = currentSpace;
+            } else
+            {
+                if (currentSpaceLoad < lowestLoadSpace.getLoad())
+                {
+                    lowestLoadSpace = currentSpace;
+                }
             }
         }
-
-
 
         if (lowestLoadSpace != null)
         {
-            // if a start of same type is pending, we dont need to balance until is up
-            if (!ClientFactory.getServerControl().isServerStarting(largestPendingResourceSpace.getResourceType()))
+            synchronized (ClientFactory.getServerControl())
             {
-                freeResource(lowestLoadSpace.removeFirstFreeResource());
-                ClientFactory.getServerControl().startServer(largestPendingResourceSpace.getResourceType());
+                if (!ClientFactory.getServerControl().isServerStarting(largestPendingResourceSpace.getResourceType()))
+                {
+                    freeResource(lowestLoadSpace.removeFirstFreeResource());
+                    ClientFactory.getServerControl().startServer(largestPendingResourceSpace.getResourceType());
+                }
             }
-
         }
     }
 
-    private ActiveResourceSpace getLargestResourceSpace()
+    private ResourceSpace getLargestResourceSpace()
     {
-        ActiveResourceSpace largestPending = null;
+        ResourceSpace largestPending = null;
 
         try
         {
-            ActiveResourceSpace pendingRequests = Ordering.natural().max(activeResourceSpaces.values());
+            ResourceSpace pendingRequests = Ordering.natural().max(activeResourceSpaces.values());
 
             if (pendingRequests.isAnyRequestPending())
             {
@@ -328,19 +337,19 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
     }
 
-    private ActiveResourceSpace getPendingRequestForType(final String resourceType)
+    private ResourceSpace getResourceSpaceForType(final String resourceType)
     {
         if (!activeResourceSpaces.containsKey(resourceType))
         {
-            activeResourceSpaces.put(resourceType, new ActiveResourceSpace(resourceType));
+            activeResourceSpaces.put(resourceType, new ResourceSpace(resourceType));
         }
 
         return activeResourceSpaces.get(resourceType);
     }
 
-    private ActiveResourceSpace getResourceSpace(final Resource res)
+    private ResourceSpace getResourceSpace(final Resource res)
     {
-        return getPendingRequestForType(res.getType().getTypeName());
+        return getResourceSpaceForType(res.getType().getTypeName());
     }
 
     private boolean isPossibleToStartNewServer()

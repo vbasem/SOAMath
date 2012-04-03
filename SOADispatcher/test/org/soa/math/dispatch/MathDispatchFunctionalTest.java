@@ -52,7 +52,7 @@ public class MathDispatchFunctionalTest
         final String result = "4";
         final int numberOfIterations = 100;
         //    final MathDispatch dispatcher = new MathDispatch();
-
+        final MathDispatch dispatcher = new MathDispatch();
         waitTillApplicationBootstraps();
 
         Thread t1 = new Thread(new Runnable()
@@ -67,7 +67,7 @@ public class MathDispatchFunctionalTest
                     {
                         try
                         {
-                            MathDispatch dispatcher = new MathDispatch();
+
                             assertEquals(result, dispatcher.add(a, b));
                         } catch (ParseException ex)
                         {
@@ -95,7 +95,6 @@ public class MathDispatchFunctionalTest
                     {
                         try
                         {
-                            MathDispatch dispatcher = new MathDispatch();
                             assertEquals(result, dispatcher.add(a, b));
                         } catch (ParseException ex)
                         {
@@ -125,7 +124,34 @@ public class MathDispatchFunctionalTest
                     {
                         try
                         {
-                            MathDispatch dispatcher = new MathDispatch();
+                            assertEquals(result, dispatcher.add(a, b));
+                        } catch (ParseException ex)
+                        {
+                            Logger.getLogger(MathDispatchFunctionalTest.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } catch (InterruptedException ex)
+                    {
+                        Logger.getLogger(MathDispatchFunctionalTest.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ExecutionException ex)
+                    {
+                        Logger.getLogger(MathDispatchFunctionalTest.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+
+        Thread t4 = new Thread(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                for (int i = 0; i < numberOfIterations; i++)
+                {
+                    try
+                    {
+                        try
+                        {
                             assertEquals(result, dispatcher.add(a, b));
                         } catch (ParseException ex)
                         {
@@ -146,11 +172,13 @@ public class MathDispatchFunctionalTest
         t1.start();
         t2.start();
         t3.start();
+        t4.start();
         try
         {
             t1.join();
             t2.join();
             t3.join();
+            t4.join();
         } catch (InterruptedException ex)
         {
             Logger.getLogger(MathDispatchFunctionalTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -159,6 +187,7 @@ public class MathDispatchFunctionalTest
     }
 
     @Test
+    @Ignore
     public void testSingleOperation() throws InterruptedException, ExecutionException, ParseException
     {
         final String a = "2";
@@ -169,11 +198,12 @@ public class MathDispatchFunctionalTest
 
         waitTillApplicationBootstraps();
         MathDispatch dispatcher = new MathDispatch();
-        assertEquals(result, dispatcher.multiply(a, b));
+        assertEquals(result, dispatcher.add(a, b));
 
     }
-    
+
     @Test
+    @Ignore
     public void testDispatcherStartup() throws InterruptedException
     {
         waitTillApplicationBootstraps();

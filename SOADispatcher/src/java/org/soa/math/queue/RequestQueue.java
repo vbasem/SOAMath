@@ -4,8 +4,7 @@
  */
 package org.soa.math.queue;
 
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import javax.el.MethodNotFoundException;
 import org.soa.math.executer.task.Task;
@@ -31,16 +30,16 @@ public class RequestQueue extends ConcurrentHashMap implements TaskQueue, Iterab
     }
 
     @Override
-    public BlockingQueue getQueueForRequestType(RequestType type)
+    public Queue getQueueForRequestType(RequestType type)
     {
-        return (BlockingQueue) get(type);
+        return (Queue) get(type);
     }
     
     private void instantiateQueueForTypeIfNotExists(RequestType requestType)
     {
         if (!containsKey(requestType))
         {
-            put(requestType, new LinkedBlockingQueue());
+            put(requestType, new ConcurrentLinkedQueue());
         }
     }
 
@@ -53,7 +52,7 @@ public class RequestQueue extends ConcurrentHashMap implements TaskQueue, Iterab
 
     private void addTaskToQueue(Task task)
     {
-        BlockingQueue queue = (BlockingQueue) get(task.getRequestType());
+        Queue queue = (ConcurrentLinkedQueue) get(task.getRequestType());
         queue.add(task);
     }
 
@@ -73,7 +72,6 @@ public class RequestQueue extends ConcurrentHashMap implements TaskQueue, Iterab
         private Set mapKeys;
         private Iterator keySetIterator;
         private RequestQueue queue; 
-        private RequestType nextIterationKey = null;
         
         public Itr(RequestQueue q)
         {
@@ -82,43 +80,18 @@ public class RequestQueue extends ConcurrentHashMap implements TaskQueue, Iterab
             keySetIterator = mapKeys.iterator();
         }
         
-        /**
-         * check first if we have more request type queues
-         * next check if that queue has any elements.
-         * @return 
-         */
         @Override
         public boolean hasNext()
         {
-            boolean hasNext = false;
-            boolean nextQueueAvailable = false;
-            
-            while(!hasNext)
-            {
-                nextQueueAvailable = keySetIterator.hasNext();
-                
-                if (nextQueueAvailable)
-                {
-                    nextIterationKey = (RequestType) keySetIterator.next();
-
-                    if (queue.getQueueForRequestType(nextIterationKey).size() > 0)
-                    {
-                        hasNext = true;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            
-            return hasNext;
+            return keySetIterator.hasNext();
         }
 
         @Override
         public Object next()
         {
-            Object task = queue.getQueueForRequestType(nextIterationKey).poll();
+            RequestType nextType = (RequestType) keySetIterator.next();
+            
+            Object task = queue.getQueueForRequestType(nextType).poll();
 
             return task;
         }
@@ -127,7 +100,6 @@ public class RequestQueue extends ConcurrentHashMap implements TaskQueue, Iterab
         public void remove()
         {
             throw new MethodNotFoundException("no remove for queue iterator, implement it if you want");
-            //queue.getQueueForRequestType((RequestType) keySetIterator.next()).remove();
         }
         
     }

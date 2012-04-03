@@ -1,5 +1,7 @@
 package org.soa.math.dispatch.server;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.xml.ws.Endpoint;
 
 public abstract class StandaloneServer
@@ -31,7 +33,9 @@ public abstract class StandaloneServer
     protected void runServerWithUrlAndServingObject()
     {
         System.out.println("=========Starting Server=========");
-        Endpoint.publish(getCompleteServerUrl(), getServingObject());
+        Endpoint serverEndPoint = Endpoint.create( getServingObject());
+        serverEndPoint.setExecutor(Executors.newFixedThreadPool(4));
+        serverEndPoint.publish(getCompleteServerUrl());
     }
 
     protected String getCompleteServerUrl()

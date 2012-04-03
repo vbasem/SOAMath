@@ -21,6 +21,10 @@ public class QueueMonitor implements Monitor, Runnable
 {
 
     private int slotsUsed = 0;
+    private int slotsAvailable = SettingsRepository.
+                getConcurrencySettings().
+                getNumericProperty("max_number_of_tasks_being_executed");
+    
     private Iterator itr = null;
     private final Thread monitoringThread = new Thread(this);
     private boolean stopMonitorThread = false;
@@ -34,7 +38,11 @@ public class QueueMonitor implements Monitor, Runnable
             fetchNewTaskRoundRobin();
             try
             {
-                monitoringThread.sleep(10);
+                //monitoringThread.sleep(20);
+                synchronized (monitoringThread)
+                {
+                    monitoringThread.wait();
+                }
             } catch (InterruptedException ex)
             {
                 Logger.getLogger(QueueMonitor.class.getName()).log(Level.SEVERE, null, ex);
@@ -51,6 +59,13 @@ public class QueueMonitor implements Monitor, Runnable
             monitoringThread.start();
             ExecutorFactory.getStaticExecutionControl().addObserver(this);
         }
+        else
+        {
+            synchronized (monitoringThread)
+            {
+                monitoringThread.notify();
+            }
+        }
 
     }
     
@@ -65,7 +80,7 @@ public class QueueMonitor implements Monitor, Runnable
     {
         freeSlot();
         // TODO: use a wake up system
-        //fetchNewTaskRoundRobin();
+        startMonitor();
     }
     
     protected void fetchNewTaskRoundRobin()
@@ -74,8 +89,14 @@ public class QueueMonitor implements Monitor, Runnable
         
         while (areFreeSlotsAvailable() && iterator.hasNext())
         {
-            occupySlot();
             Task task = (Task) iterator.next();
+            
+            if (task == null)
+            {
+                continue;
+            }
+
+            occupySlot();
             putTaskFromQueueForExecution(task);
         }
                     
@@ -95,10 +116,7 @@ public class QueueMonitor implements Monitor, Runnable
     {
         boolean answer;
         
-        if (slotsUsed <
-                SettingsRepository.
-                getConcurrencySettings().
-                getNumericProperty("max_number_of_tasks_being_executed"))
+        if (slotsUsed < slotsAvailable)
         {
             answer = true;
         }
