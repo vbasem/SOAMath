@@ -1,0 +1,38 @@
+* {
+  border: none;
+}
+
+body {
+	background-color: #a1bad1;
+/*	background-image: url(images/bg-image.jpg);*/
+	background-position: center top;
+	background-repeat: no-repeat;
+        
+}
+
+
+textarea:focus, input:focus {
+        border: 2px solid #900;
+}
+
+input.large_field
+{
+background-color:#F9F8E4; /* when in focus */
+/*background:url("/images/input_bg.png") repeat-x scroll left top #F7FCFF;*/
+border:1px solid #97B5D2;
+color:#25313C;
+font-family:Georgia,Times,"Times New Roman",serif;
+font-size:28px; /* This probably makes it "fat" as you want */
+width:480px;
+font:13px 'Lucida Grande',Helvetica,Arial,sans-serif;
+margin:0;
+outline:0 none;
+padding:7px;
+}
+
+label {
+        float: left;
+        text-align: right;
+        margin-right: 15px;
+        width: 100px;
+}

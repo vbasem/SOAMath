@@ -4,6 +4,11 @@
  */
 package org.soa.math.decomposer;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Basem
@@ -18,18 +23,20 @@ public class MathParser
 
     private MathParser()
     {
-        /* Using a private contructor to prevent instantiation
-        Using class as a simple static utility class
+        /*
+         * Using a private contructor to prevent instantiation Using class as a
+         * simple static utility class
          */
     }
 
-    private static int evaluate(String leftSide, char oper, String rightSide)
-            throws IllegalArgumentException
+    private static String evaluate(String leftSide, char oper, String rightSide)
+            throws IllegalArgumentException, InterruptedException, ExecutionException
     {
         System.out.println("Evaluating: " + leftSide + " (" + oper + ") " + rightSide);
-        int total = 0;
-        int leftResult = 0;
-        int rightResult = 0;
+        Future<String> total = null;
+
+        String leftResult = null;
+        String rightResult = null;
 
         int operatorLoc = findOperatorLocation(leftSide);
         if (operatorLoc > 0 && operatorLoc < leftSide.length() - 1)
@@ -39,17 +46,11 @@ public class MathParser
                     leftSide.substring(operatorLoc + 1, leftSide.length()));
         } else
         {
-            try
-            {
-                leftResult = Integer.parseInt(leftSide);
-            } catch (Exception e)
-            {
-                throw new IllegalArgumentException("Invalid value found in portion of equation: "
-                        + leftSide);
-            }
+            leftResult = leftSide;
         }
 
         operatorLoc = findOperatorLocation(rightSide);
+
         if (operatorLoc > 0 && operatorLoc < rightSide.length() - 1)
         {
             rightResult = evaluate(rightSide.substring(0, operatorLoc),
@@ -57,36 +58,33 @@ public class MathParser
                     rightSide.substring(operatorLoc + 1, rightSide.length()));
         } else
         {
-            try
-            {
-                rightResult = Integer.parseInt(rightSide);
-            } catch (Exception e)
-            {
-                throw new IllegalArgumentException("Invalid value found in portion of equation: "
-                        + rightSide);
-            }
+            rightResult = rightSide;
         }
 
         System.out.println("Getting result of: " + leftResult + " " + oper + " " + rightResult);
+
         switch (oper)
         {
             case '/':
-                total = leftResult / rightResult;
+                total = PrimitiveMath.divide(leftResult, rightResult);
                 break;
             case '*':
-                total = leftResult * rightResult;
+                total = PrimitiveMath.multiply(leftResult, rightResult);
                 break;
             case '+':
-                total = leftResult + rightResult;
+                total = PrimitiveMath.add(leftResult, rightResult);
                 break;
             case '-':
-                total = leftResult - rightResult;
+                total = PrimitiveMath.substract(leftResult, rightResult);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown operator.");
         }
-        System.out.println("Returning a result of: " + total);
-        return total;
+
+        String result = total.get();
+        System.out.println("Returning a result of: " + result);
+
+        return result;
     }
 
     private static int findOperatorLocation(String string)
@@ -103,22 +101,37 @@ public class MathParser
         return index;
     }
 
-    public static int processEquation(String equation)
-            throws IllegalArgumentException
+    public static String processEquation(String equation)
     {
-        return evaluate(equation, '+', "0");
+        String result = null;
+        try
+        {
+            result = evaluate(equation, '+', "0");
+        } catch (IllegalArgumentException ex)
+        {
+            Logger.getLogger(MathParser.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex)
+        {
+            Logger.getLogger(MathParser.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex)
+        {
+            Logger.getLogger(MathParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return result;
     }
 
-    public int parseExpression(String expression)
+    public String parseExpression(String expression)
     {
 
-            int result = MathParser.processEquation(expression);
-            
-            return result;
+        String result = MathParser.processEquation(expression);
+
+        return result;
     }
-    
+
     public static void main(String[] args)
     {
-        System.out.println(MathParser.processEquation("(2+)3*7/2-1"));
+        System.out.println(MathParser.processEquation("2+3*7/2-1"));
+        System.exit(0);
     }
 }
