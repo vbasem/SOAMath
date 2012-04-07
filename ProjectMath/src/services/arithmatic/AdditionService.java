@@ -12,9 +12,9 @@ public class AdditionService implements ArithmaticService
 {
     private <T> T add(T x, T y)
     {
-		Arithmetic ar = new Arithmetic<Number>((Number) x);
+		Arithmetic ar = new Arithmetic<Double>((Double) x);
 
-		return (T) ar.add((Number) y).value();
+		return (T) ar.add((Double) y).value();
     }
 
     public <T> T calculate(T x, T y)

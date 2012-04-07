@@ -12,9 +12,9 @@ public class SubstractionService implements ArithmaticService
 {
     private <T> T divide(T x, T y)
     {
-		Arithmetic ar = new Arithmetic<Number>((Number) x);
+		Arithmetic ar = new Arithmetic<Double>((Double) x);
 
-		return (T) ar.sub((Number) y).value();
+		return (T) ar.sub((Double) y).value();
     }
 
     public <T> T calculate(T x, T y)
