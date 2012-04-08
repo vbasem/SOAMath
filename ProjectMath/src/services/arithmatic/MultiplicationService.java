@@ -12,9 +12,12 @@ public class MultiplicationService implements ArithmaticService
 {
     private <T> T substract(T x, T y)
     {
-		Arithmetic ar = new Arithmetic<Double>((Double) x);
+    	Double firstToDouble = Double.valueOf(x.toString());
+    	Double secondToDouble = Double.valueOf(y.toString());
 
-		return (T) ar.mul((Double) y).value();
+		Arithmetic ar = new Arithmetic<Double>(firstToDouble);
+
+		return (T) ar.mul(secondToDouble).value();
     }
 
     public <T> T calculate(T x, T y)
