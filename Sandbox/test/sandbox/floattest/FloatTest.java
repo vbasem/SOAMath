@@ -4,12 +4,8 @@
  */
 package sandbox.floattest;
 
-import sandbox.sets.*;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  *
@@ -24,5 +20,23 @@ public class FloatTest
         double y = 1.28;
         
         assertEquals(x, y, 0.03);
+    }
+    
+    @Test
+    public void testLongToDouble()
+    {
+        double result = 2;
+        long input = 2;
+        
+        System.out.println(numberEater(0));
+        assertEquals(result, numberEater("2.0"), 0.001 );
+    }
+            
+    
+    private <T> Double numberEater(T a)
+    {
+
+        Double x = Double.valueOf(a.toString());    
+        return x;
     }
 }

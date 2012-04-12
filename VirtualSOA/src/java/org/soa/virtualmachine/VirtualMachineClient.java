@@ -4,11 +4,14 @@
  */
 package org.soa.virtualmachine;
 
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
-import java.util.*;
+import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
+import java.io.BufferedReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.Singleton;
+import org.soa.virtualmachine.commands.*;
 import org.soa.virtualmachine.config.SettingsRepository;
 import org.virtualbox_4_1.*;
 
@@ -19,7 +22,6 @@ public class VirtualMachineClient
     private VirtualBoxManager manager;
     private IVirtualBox box;
     private ISession session;
-
 
     public void startArithmaticServer(String operationPrefix, String mode)
     {
@@ -38,13 +40,12 @@ public class VirtualMachineClient
         }
     }
 
-    protected List<String> getArithmaticServerProcessCommand(String id, String mode)
+    protected IVirtualMachineCommand getArithmaticServerProcessCommand(String id, String mode)
     {
+        CommandFromConfig com = new CommandFromConfig("java_arithmatic");
         String dhcpIp = box.getDHCPServers().get(0).getIPAddress();
-        List<String> arithmaticCommand = new ArrayList<String>();
-        arithmaticCommand.add("-cp");
-        arithmaticCommand.add("/home/basemv/SOAMath/ProjectMath/bin/:/home/basemv/SOAMath/ProjectMath/jax-ws/:/home/basemv/SOAMath/ProjectMath/lib/Generic-Arithmetic-1.0.0.jar");
-        arithmaticCommand.add("services.server.ArithmaticStandaloneServer");
+        List<String> arithmaticCommand = com.getCommandArguments();
+
         arithmaticCommand.add("--dhcp=" + dhcpIp);
         arithmaticCommand.add("--servicemode=" + mode);
         arithmaticCommand.add("--registerserver="
@@ -53,15 +54,15 @@ public class VirtualMachineClient
 
         Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, arithmaticCommand.toString(), arithmaticCommand);
 
-        return arithmaticCommand;
+        return com;
     }
 
     protected String nameOfNextFreeMachine(String operationPrefix)
     {
         String machineName = null;
-        
+
         boolean waitForMAchinesToPowerOff = true;
-        
+
         for (int i = 0; i < 10; i++)
         {
             for (IMachine mach : box.getMachines())
@@ -75,7 +76,7 @@ public class VirtualMachineClient
                     }
                 }
             }
-            
+
             sleep(1000);
         }
 
@@ -99,6 +100,41 @@ public class VirtualMachineClient
         manager.startVm(machineName, null, 7000);
 
         return "Attempting to start : " + machineName + "<br />";
+    }
+
+    public void shutdown(String machineName)
+    {
+        resetVm("");
+        connectToVBox("");
+
+        try
+        {
+            CommandFromConfig command = new CommandFromConfig("shutdown");
+            ISession session = getMachineSession(machineName);
+            Holder<Long> pid = new Holder<Long>();
+            IProgress prog = session.getConsole().getGuest().executeProcess(
+                    command.getCommand(),
+                    new Long(ExecuteProcessFlag.WaitForStdOut.value()),
+                    command.getCommandArguments(),
+                    null,
+                    command.getUser().getUserName(),
+                    command.getUser().getUserPassword(),
+                    new Long(7000),
+                    pid);
+            
+            int i = 0;
+            while (!prog.getCompleted() && i++ < 10)
+            {
+                sleep(1000);
+            }
+            session.getConsole().releaseRemote();
+            session.unlockMachine();
+
+        } catch (Exception ex)
+        {
+            Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        resetVm("");
     }
 
     public String stopVm(String machineName)
@@ -152,7 +188,7 @@ public class VirtualMachineClient
         return session;
     }
 
-    public void startProcess(String machineName, List<String> args)
+    public void startProcess(String machineName, IVirtualMachineCommand command)
     {
         ISession session = null;
 
@@ -171,7 +207,15 @@ public class VirtualMachineClient
 
             if (session.getConsole().getGuest().getAdditionsStatus(AdditionsRunLevelType.Userland))
             {
-                IProgress prog = session.getConsole().getGuest().executeProcess("/usr/bin/java", new Long(1), args, env, "basemv", "basemv", new Long(7000), pid);
+                IProgress prog = session.getConsole().getGuest().executeProcess(
+                        command.getCommand(),
+                        new Long(1),
+                        command.getCommandArguments(),
+                        env,
+                        command.getUser().getUserName(),
+                        command.getUser().getUserPassword(),
+                        new Long(7000),
+                        pid);
             }
 
         } catch (Exception ex)
@@ -203,7 +247,7 @@ public class VirtualMachineClient
         int waitedSoFar = 0;
 
         waitForUnlockedSession();
-        
+
         while (waitedSoFar < maxSleepTime)
         {
             if (machine.getState() != wantedState)

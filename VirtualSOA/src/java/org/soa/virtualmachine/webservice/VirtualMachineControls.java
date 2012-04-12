@@ -43,7 +43,7 @@ public class VirtualMachineControls
             public void run()
             {
                 VirtualMachineClient client = new VirtualMachineClient();
-                client.stopVm(serverIdentifier);
+                client.shutdown(serverIdentifier);
             }
         });
         
