@@ -1,6 +1,8 @@
 
 package services.server;
 
+import java.util.concurrent.Executors;
+
 import javax.xml.ws.Endpoint;
 
 public abstract class StandaloneServer
@@ -31,7 +33,10 @@ public abstract class StandaloneServer
     protected void runServerWithUrlAndServingObject()
     {
         System.out.println("=========Starting Server=========");
-        Endpoint.publish(getCompleteServerUrl(), getServingObject());
+
+        Endpoint serverEndPoint = Endpoint.create( getServingObject());
+        serverEndPoint.setExecutor(Executors.newCachedThreadPool());
+        serverEndPoint.publish(getCompleteServerUrl());
     }
 
     protected String getCompleteServerUrl()
