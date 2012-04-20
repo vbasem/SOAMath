@@ -34,7 +34,7 @@ public abstract class StandaloneServer
     {
         System.out.println("=========Starting Server=========");
         Endpoint serverEndPoint = Endpoint.create( getServingObject());
-        serverEndPoint.setExecutor(Executors.newFixedThreadPool(4));
+        serverEndPoint.setExecutor(Executors.newCachedThreadPool());
         serverEndPoint.publish(getCompleteServerUrl());
     }
 

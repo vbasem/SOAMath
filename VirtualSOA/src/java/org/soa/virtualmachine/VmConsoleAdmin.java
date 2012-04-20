@@ -13,7 +13,9 @@ public class VmConsoleAdmin
     public static void main(String[] args)
     {
         VirtualMachineClient client = new VirtualMachineClient();
+        client.connectToVBox(null);
         System.out.println("trying");
-        client.stopVm("arithmatic1");
+        //client.shutdown("arithmatic2");
+        System.out.println(client.getNumberOfAvailableMachinesForServiceTypeFromServerIdentifier("arithmatic1"));
     }
 }

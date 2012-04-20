@@ -23,21 +23,30 @@ public class VirtualMachineClient
     private IVirtualBox box;
     private ISession session;
 
-    public void startArithmaticServer(String operationPrefix, String mode)
+    public boolean startArithmaticServer(String operationPrefix, String mode)
     {
-        resetVm("");
+        boolean result = false;
+
         connectToVBox("");
         String nextAvailableMachineName = nameOfNextFreeMachine(operationPrefix);
 
         if (nextAvailableMachineName != null)
         {
-            startVm(nextAvailableMachineName);
-//            sleep(SettingsRepository
-//                    .getServicesUrlSettings()
-//                    .getNumericProperty("sleep_before_starting_commands_on_remote"));
-            startProcess(nextAvailableMachineName,
-                    getArithmaticServerProcessCommand(nextAvailableMachineName, mode));
+            try
+            {
+                MachineLock.lock(nextAvailableMachineName);
+                result = startVm(nextAvailableMachineName);
+                startProcess(nextAvailableMachineName,
+                        getArithmaticServerProcessCommand(nextAvailableMachineName, mode));
+            } finally
+            {
+                MachineLock.unlock(nextAvailableMachineName);
+            }
+
+
         }
+
+        return result;
     }
 
     protected IVirtualMachineCommand getArithmaticServerProcessCommand(String id, String mode)
@@ -69,7 +78,7 @@ public class VirtualMachineClient
             {
                 if (mach.getName().indexOf(operationPrefix) != -1)
                 {
-                    if (mach.getState() == MachineState.PoweredOff)
+                    if (!MachineLock.isLocked(mach.getName()) && mach.getState() == MachineState.PoweredOff)
                     {
                         machineName = mach.getName();
                         break;
@@ -77,36 +86,29 @@ public class VirtualMachineClient
                 }
             }
 
-            sleep(1000);
+            //sleep(100);
         }
-
+        Logger.getLogger("vmname").warning("found available machine: " + machineName);
         return machineName;
     }
 
-    public String startVm(String machineName)
+    public boolean startVm(String machineName)
     {
-        // wait max 10 sex for machine status to change to powered down before we start it
-//        try
-//        {
-//            waitForStatusChange(manager.getVBox().findMachine(machineName),
-//                    MachineState.PoweredOff,
-//                    1000,
-//                    10000);
-//        } catch (VirtualMachineStateError ex)
-//        {
-//            Logger.getLogger("vmcontrol").severe(ex.getMessage());
-//        }
-
-        manager.startVm(machineName, null, 7000);
-
-        return "Attempting to start : " + machineName + "<br />";
+        return manager.startVm(machineName, null, 7000);
     }
 
-    public void shutdown(String machineName)
+    public boolean shutdown(String machineName)
     {
-        resetVm("");
+        boolean result = false;
+        //resetVm("");
         connectToVBox("");
-
+        // abort if machine is not running
+        if (!MachineLock.isLocked(machineName) && box.findMachine(machineName).getState() != MachineState.Running)
+        {
+            Logger.getLogger("vm").severe("The machine " + machineName + " is not running to be shutdown.");
+            return result;
+        }
+        MachineLock.lock(machineName);
         try
         {
             CommandFromConfig command = new CommandFromConfig("shutdown");
@@ -119,22 +121,27 @@ public class VirtualMachineClient
                     null,
                     command.getUser().getUserName(),
                     command.getUser().getUserPassword(),
-                    new Long(7000),
+                    new Long(10000),
                     pid);
-            
-            int i = 0;
-            while (!prog.getCompleted() && i++ < 10)
+
+            session.unlockMachine();
+            while (!prog.getCompleted())
             {
                 sleep(1000);
             }
-            session.getConsole().releaseRemote();
-            session.unlockMachine();
+
+            waitForStatusChange(box.findMachine(machineName), MachineState.PoweredOff, 1000, 100000);
+            MachineLock.unlock(machineName);
+            //session.getConsole().releaseRemote();
+
+            result = true;
 
         } catch (Exception ex)
         {
             Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);
         }
-        resetVm("");
+
+        return result;
     }
 
     public String stopVm(String machineName)
@@ -218,6 +225,8 @@ public class VirtualMachineClient
                         pid);
             }
 
+            session.unlockMachine();
+
         } catch (Exception ex)
         {
             Logger.getLogger(VirtualMachineClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -237,6 +246,32 @@ public class VirtualMachineClient
 
         manager.connect(SettingsRepository.getServicesUrlSettings().getProperty("vbox_service_url"), null, null);
         box = manager.getVBox();
+    }
+
+    public int getNumberOfAvailableMachinesForServiceType(String serviceType)
+    {
+        int availableCount = 0;
+
+        for (IMachine mach : box.getMachines())
+        {
+            if (mach.getName().indexOf(serviceType) != -1)
+            {
+                if (mach.getState() == MachineState.PoweredOff)
+                {
+                    availableCount++;
+                }
+            }
+        }
+
+        return availableCount;
+    }
+
+    public int getNumberOfAvailableMachinesForServiceTypeFromServerIdentifier(String serverIdentifier)
+    {
+        // remove id number to get serviceType
+        String serviceType = serverIdentifier.substring(0, serverIdentifier.length() - 1);
+
+        return getNumberOfAvailableMachinesForServiceType(serviceType);
     }
 
     private void waitForStatusChange(IMachine machine,

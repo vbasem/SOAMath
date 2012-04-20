@@ -17,19 +17,24 @@ public class VirtualMachineControlClient extends WebServiceClient
         service = new org.soa.virtualmachine.webservice.VirtualMachineControlsService(getEndPointUrl(), getQname());
     }
 
-    public void startService(String operationMode)
+    public int startService(String operationMode)
     {
+        int availableMachines;
         openPort();
-        port.startArithmaticServer(operationMode);
-        closePort();
-    }
-    
-    public void stopService(String machineId)
-    {
-        openPort();
-        port.stopServer(machineId);
+        availableMachines = port.startArithmaticServer(operationMode);
         closePort();
         
+        return  availableMachines;
+    }
+    
+    public int stopService(String machineId)
+    {
+        int availableMachines;
+        openPort();
+        availableMachines = port.stopServer(machineId);
+        closePort();
+        
+        return availableMachines;
     }
     
     protected void openPort()

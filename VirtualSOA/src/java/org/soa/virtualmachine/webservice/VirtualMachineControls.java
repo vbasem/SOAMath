@@ -15,38 +15,30 @@ import org.soa.virtualmachine.VirtualMachineClient;
 @WebService()
 public class VirtualMachineControls
 {
-
-    public void startArithmaticServer(final String arithmaticMode)
-    {
-        Logger.getLogger("vmControl").info("starting machine for mode: " + arithmaticMode);
-        Thread t = new Thread(new Runnable()
-        {
-            
-            @Override
-            public void run()
-            {
-                VirtualMachineClient client = new VirtualMachineClient();
-                client.startArithmaticServer("arithmatic", arithmaticMode);
-            }
-        });
-        
-        t.start();
-    }
+    private static final String ARITHMETIC_PREFIX = "arithmatic";
     
-    public void stopServer(final String serverIdentifier)
+    public int startArithmaticServer(final String arithmaticMode)
     {
+
+        Logger.getLogger("vmControl").info("starting machine for mode: " + arithmaticMode);
+        VirtualMachineClient client = new VirtualMachineClient();
+        client.startArithmaticServer(ARITHMETIC_PREFIX, arithmaticMode);
+
+        return client.getNumberOfAvailableMachinesForServiceType(ARITHMETIC_PREFIX);
+    }
+
+    public int stopServer(final String serverIdentifier)
+    {
+        int result = 0;
         Logger.getLogger("vmControl").info("stoping machine: " + serverIdentifier);
-        Thread t = new Thread(new Runnable()
-        {
-            
-            @Override
-            public void run()
-            {
-                VirtualMachineClient client = new VirtualMachineClient();
-                client.shutdown(serverIdentifier);
-            }
-        });
+
+        VirtualMachineClient client = new VirtualMachineClient();
+        client.shutdown(serverIdentifier);
         
-        t.start();
+        result = client.getNumberOfAvailableMachinesForServiceTypeFromServerIdentifier(serverIdentifier);
+        
+        client.resetVm("");
+        
+        return result;
     }
 }

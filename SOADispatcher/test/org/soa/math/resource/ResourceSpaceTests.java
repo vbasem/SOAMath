@@ -14,7 +14,7 @@ import org.soa.math.properties.SettingsRepository;
  */
 public class ResourceSpaceTests
 {
-    private final double LOAD_DELTA = 0.01;
+    private final double LOAD_DELTA = 0.0001;
 
     public ResourceSpaceTests()
     {
@@ -75,9 +75,9 @@ public class ResourceSpaceTests
     @Test
     public void testGetLoad_freeResourcesAndSomeActivityNoPending_returnsCalculatedValueBetweenMinAndMax()
     {
-        double numberOfFreeResources = 2;
-        double pendingActivity = 0.3;
-        double expectedValue = pendingActivity / numberOfFreeResources;
+        int numberOfFreeResources = 2;
+        int pendingActivity = 3;
+        double expectedValue = (double) pendingActivity / (double) numberOfFreeResources;
 
         ResourceSpace pending = new ResourceSpace("test");
         pending.setActivity(pendingActivity);
@@ -96,11 +96,11 @@ public class ResourceSpaceTests
     @Test
     public void testGetLoad_withFreeResourceSomeActivityAndSomePending_returnsCalculatedValue()
     {
-        double numberOfFreeResources = 1.0;
-        double numberOfPendings = 3;
-        double pendingActivity = 0.4;
+        int numberOfFreeResources = 1;
+        int numberOfPendings = 3;
+        int pendingActivity = 4;
         
-        double expectedValue = numberOfPendings * pendingActivity / numberOfFreeResources;
+        int expectedValue = numberOfPendings * pendingActivity / numberOfFreeResources;
 
         ResourceSpace pending = new ResourceSpace("test");
         pending.addRequestThreadToPendingAndIncrement(new Thread());

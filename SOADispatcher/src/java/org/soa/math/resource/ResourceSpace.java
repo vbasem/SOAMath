@@ -22,12 +22,13 @@ public class ResourceSpace extends ServiceResourcesAndRequests implements Compar
 
     public static final double MAX_LOAD = SettingsRepository.getConcurrencySettings().
             getNumericProperty("max_number_of_tasks_being_executed");
-    public static final double MIN_LOAD = 0.0;
-    private static final double MAX_ACTIVITY = 1.0;
-    private static final double MIN_ACTIVITY = 0.1;
-    private static final double ACTIVITY_STEP = 0.1;
+    public static final double MIN_LOAD = 0;
     
-    private double activity = MIN_ACTIVITY;
+    private static final int MAX_ACTIVITY = 10;
+    private static final int MIN_ACTIVITY = 1;
+    private static final int ACTIVITY_STEP = 1;
+    
+    private int activity = MIN_ACTIVITY;
     private int requestCounter = 0;
     
     private Queue<Thread> threadsPending = new ConcurrentLinkedQueue<Thread>();
@@ -83,7 +84,7 @@ public class ResourceSpace extends ServiceResourcesAndRequests implements Compar
             activityFactor = (double) this.getRequestCounter();
         }
 
-        double baseLoad = activityFactor * this.getActivity();
+        double baseLoad = activityFactor * (double) this.getActivity();
 
         return baseLoad / (double) freeResources.size();
 
@@ -143,12 +144,12 @@ public class ResourceSpace extends ServiceResourcesAndRequests implements Compar
         return threadsPending.isEmpty() ? false : true;
     }
 
-    public double getActivity()
+    public int getActivity()
     {
         return this.activity;
     }
 
-    public void setActivity(double activityValue)
+    public void setActivity(int activityValue)
     {
         this.activity = activityValue;
     }
