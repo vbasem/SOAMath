@@ -127,6 +127,7 @@ public class ArithmaticWebServiceResourceMonitor extends Observable implements R
 
         if (res != null)
         {
+            getResourceSpaceForType(resourceType).increaseActivity();
             return res;
         }
 
