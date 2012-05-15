@@ -15,7 +15,7 @@ import org.soa.virtualmachine.VirtualMachineClient;
 @WebService()
 public class VirtualMachineControls
 {
-    private static final String ARITHMETIC_PREFIX = "arithmatic";
+    private static final String ARITHMETIC_PREFIX = "arithmetic";
     
     public int startArithmaticServer(final String arithmaticMode)
     {
